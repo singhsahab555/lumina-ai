@@ -1,0 +1,15 @@
+{
+  "name": "lumina-ai",
+  "private": true,
+  "description": "Neural-compressed, vision-assisted optical data modem for air-gapped transfer",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=22.18"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@lumina/protocol",
+  "version": "0.1.0",
+  "description": "Luby Transform fountain codec and optical frame format for LuminaAI",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --test \"test/**/*.test.ts\""
+  },
+  "license": "MIT"
+}

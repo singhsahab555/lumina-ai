@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.vite/
+coverage/
+*.log
+.env
+.env.*
+# Model weights are downloaded at runtime / cached by the browser, never committed
+models/
+*.gguf
+*.onnx
+*.pte
+.DS_Store
+Thumbs.db
