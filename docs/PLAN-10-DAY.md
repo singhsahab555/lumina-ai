@@ -8,12 +8,12 @@ Rule: **a working end-to-end demo exists from Day 3 onward.** Every later day ad
 | 2 | Tue Oct 27 | `apps/web` scaffold (Vite + React + TS + Tailwind, PWA). **Transmitter**: file picker → deflate → LT → 2-color canvas grid with 4 finders, looping at a configurable symbol rate | The grid animates at 30 symbols/s and a frame can be decoded from a screenshot in a unit test |
 | 3 | Wed Oct 28 | **Receiver**: getUserMedia → finder detect → homography (OpenCV.js) → sample grid → packet → LT decoder → download + SHA-256 check | 🎯 **MILESTONE: first file over light between laptop and phone in airplane mode** |
 | 4 | Thu Oct 29 | 8-color modulation + calibration border + palette classification. Adaptive 2↔8 fallback. **Inactivation decoding** (Gaussian elimination when peeling stalls) to cut overhead to ~5% | Measured KB/s ≥ 2× Day 3, and repair-only overhead < 10% in tests |
-| 5 | Fri Oct 30 | **Llama 3.2 on sender** (WebLLM, `Llama-3.2-1B-Instruct-q4f16_1`). Neural mode: doc → strict JSON schema (entities, timeline, vitals/state) → pack | A 20-page sample log becomes < 5 KB of JSON |
-| 6 | Sat Oct 31 | **Llama on receiver**: rehydrate the JSON into a readable report plus an offline Q&A panel. **Llama Guard 3 1B** safety gate (Ollama fallback if it won't run in WebLLM) | A prompt-injection payload gets blocked live |
-| 7 | Sun Nov 1 | **Mode 3: agent-to-agent handshake**. Bidirectional: each device runs TX and RX at the same time, ECDH key exchange over light, agents exchange a tool call and a signed result | Two laptops trade a signed message with no network |
-| 8 | Mon Nov 2 | AES-GCM payloads, SAM 2 screen acquisition + glare mask (ONNX Runtime Web, tiny model, ROI only), and the telemetry UI: live KB/s, droplet/block matrix, de-warp preview | All three demo modes can be selected from one UI |
-| 9 | Tue Nov 3 | Hardening: different phones, lighting, and angles (45° tilt). Perf profiling, offline PWA cache of models, bug bash. **Record the backup demo video** | The video is recorded, and 5 consecutive successful live runs are completed |
-| 10 | Wed Nov 4 | **Code freeze at noon.** README GIFs, pitch deck (3 min), submission form, rehearsal ×3 | Submitted |
+| 5 | Fri Oct 30 | **Muse Spark on the connected sender** (Meta Model API). Semantic packing: a pump-station maintenance log or manual becomes a strict JSON work-order bundle (asset, steps, parameters, limits), validated against a schema before beaming | A 20-page sample log becomes < 5 KB of valid JSON |
+| 6 | Sat Oct 31 | **Muse Glimmer verifier on the air-gapped receiver** (Ollama, local). Checks the bundle against a local policy file (allowed assets, parameter limits), flags injected instructions, and renders an actionable checklist | A tampered bundle (out-of-range setpoint plus an injected instruction) gets rejected live with networking off |
+| 7 | Sun Nov 1 | **Mode 3: return channel**. The air-gapped machine beams back an ack and telemetry on its own screen. The connected side's webcam + **SAM 3.1** (text prompt "monitor") acquires that screen, and classical tracking decodes it. ECDH key exchange over light | A closed loop runs: work order in, signed ack and telemetry out |
+| 8 | Mon Nov 2 | AES-GCM payloads, glare mask, and the telemetry UI: live KB/s, droplet/block matrix, de-warp preview, verifier verdict panel | All demo modes can be selected from one UI |
+| 9 | Tue Nov 3 | Hardening: lighting, angles (45° tilt), and a phone as a raw-mode receiver. Perf profiling and bug bash. **Record the 3-min demo video** showing only hackathon-built features | The video is recorded, and 5 consecutive successful live runs are completed |
+| 10 | Wed Nov 4 | Freeze at 3 PM ET. README GIFs, video final cut, submission on the CV platform **before 9:00 PM ET** | Submitted, with the repo public, the video link working, and all contributors listed |
 
 ## Daily rhythm
 
@@ -30,8 +30,12 @@ Rule: **a working end-to-end demo exists from Day 3 onward.** Every later day ad
 | SAM 2 too slow | It is used only for acquisition. Classical tracking does the per-frame work. |
 | Day 3 milestone slips | Everything after it slides. AI features must not start before light transfer works. |
 
-## Before Day 2: confirm hackathon rules
+## Hackathon logistics (from the participant guide)
 
-- [ ] Official rules: deadline/timezone, submission format, video length, required Meta tech, team size
-- [ ] Llama license attribution ("Built with Llama") is present in the README and the UI
-- [ ] Whether the repo must be public at submission (it already is)
+- [x] Deadline: **Wed Nov 4, 9:00 PM ET** via the CV platform. 3-min demo video. Public repo. Max team size 4.
+- [x] Track: Indie Developer, problem statement *Push the Frontier* (physical/industrial systems)
+- [ ] **Claim $150 in Meta Model API credits** (form in the guide, needs a card on file, deadline Nov 4). Set a spend limit.
+- [ ] Optional: Baseten $100 (Muse Spark Open, model id `meta-models/muse-spark-open-1026`), Modal $100
+- [ ] Pull Muse Glimmer locally: `ollama pull muse-glimmer` (check that the laptop has enough RAM/VRAM)
+- [ ] Get the judging rubric table (it was missing from the pasted guide) and align the demo to it
+- [ ] Watch: Agents 102 "Verifiable Agents" (Wed Oct 28, 12 PM ET). It maps directly onto the verifier agent.
