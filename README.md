@@ -25,7 +25,7 @@ The hackathon's rules require new work only. Everything in this repo was written
 ## Repo layout
 
 ```
-packages/lumina-protocol   LT fountain encoder/decoder + optical frame format (zero deps, tested)
+packages/lumina-protocol   LT fountain codec, frame format, grid, camera-frame reader, file envelope (zero deps)
 packages/lumina-agents     Meta models: Muse Spark packer, Muse Glimmer verifier, SAM 3.1 client
 apps/web                   React PWA: transmitter (Day 2), receiver (Day 3)
 docs/                      Architecture, 10-day plan, decisions
@@ -39,9 +39,26 @@ npm install
 npm test                       # protocol + web tests
 
 cd apps/web
-npm run dev                    # transmitter at http://localhost:5173
+npm run dev                    # http://localhost:5173  (Transmit tab; Receive tab = #rx)
 npm run build && npm run capture   # headless Edge: re-capture screenshots + test fixtures
+npm run build && npm run e2e       # headless Edge with a fake webcam: receiver decodes a 56 KB file
+npm run lan                        # HTTPS on your Wi-Fi (port 4443) so a phone can use its camera
 ```
+
+### Laptop → phone over light
+
+Live app (HTTPS, installable, works offline): **https://singhsahab555.github.io/lumina-ai/**
+
+1. On the phone open the link, tap **Add to Home screen** (installs the offline app), then open it and switch to **Receive**. Allow the camera when asked.
+2. Turn on **airplane mode** on the phone.
+3. On the laptop open the same link, **Transmit** tab, load a file. On the phone tap **Start camera** and point it at the grid so it fills at least a third of the view.
+4. The phone shows **SHA-256 verified, byte-exact** and a Download button.
+
+Local alternative: `npm run lan` in `apps/web` serves self-signed HTTPS on port 4443 (phones may restrict the camera on it).
+
+The reverse direction also works without certificates: phone transmits (plain `http://` LAN URL is fine), laptop webcam receives on `localhost`.
+
+![Receiver locked on a tilted grid](docs/media/day3-receiver-scanning.png)
 
 ![Transmitter beaming a work order at 30 symbols/s](docs/media/day2-transmitter-running.png)
 

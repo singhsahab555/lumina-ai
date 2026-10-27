@@ -2,6 +2,19 @@
 
 Measured numbers per day. Newest first.
 
+## Day 3: receiver (built Tue Oct 27, a day early)
+
+- Decision: **no OpenCV.js**. Finder detection + homography are ~300 lines of TS in `lumina-protocol/src/vision.ts`. It's 8 MB less to cache in the PWA, works offline, and the same code runs in Node tests.
+- Receiver tab (`#rx`): getUserMedia (rear camera, ideal 1080p60) → frame downscaled to ≤1280 px → Web Worker: `readFrame` → per-session LT decoders → inflate → envelope → SHA-256. Live overlay outlines the locked grid (green = CRC ok, yellow = located but CRC failed). Download button + byte-exact badge.
+- File envelope (`LUMF`): name + SHA-256 travel inside the payload, so the receiver verifies the file itself. Transmitter now shows the SHA-256 too.
+- **Measured** `readFrame`: 36 ms per 1280×720 frame in Node (88 ms before a fix: noise in dark regions made thousands of speckle blobs; fixed with a ≥12-level contrast floor). In headless Edge's worker: 50 to 100 ms (software rendering).
+- Robustness on synthetic camera frames (6 trials each): ≥4 px/module 100% at mild blur; 6 px/module survives blur radius 2; 8 px/module survives radius 4. 3 px/module is unreliable. Torn frames (top half one symbol, bottom another) always fail the CRC and are never decoded wrong.
+- Bug fixed: the dark area around the screen "rings" the quiet zone and was taken for a giant marked finder. Rings touching the frame edge are now rejected.
+- **Browser e2e** (`npm run e2e`): Edge with a fake webcam fed a Y4M of tilted, blurred, noisy frames (each symbol twice, every 5th frame torn). The 56,190 B shift log (K = 11) came back **SHA-256 verified, byte-exact** via the real download button in ~3 to 4 s.
+- LAN: `npm run lan` serves the built app over self-signed HTTPS (phones only allow the camera on secure origins).
+- Tests: protocol 19/19, web 5/5, agents 16/16.
+- **Still to do for the milestone:** the physical laptop → phone run in airplane mode (needs the user's phone). Known risk: the self-signed cert stops the service worker installing on the phone, so the page must be loaded before airplane mode is turned on. A proper HTTPS host (GitHub Pages) fixes this once the repo is pushed.
+
 ## Day 2+: Tue Oct 27, Meta model groundwork
 
 - New `packages/lumina-agents`: bundle schema + validator, site policy checks, Muse Spark packer (Meta Model API, strict structured output, retry-on-invalid), Muse Glimmer verifier agent (Ollama, tool calls, policy-final, fail-closed), SAM 3.1 request builder, and per-call trace.

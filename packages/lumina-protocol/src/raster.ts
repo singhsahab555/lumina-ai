@@ -1,7 +1,7 @@
 // Pixel-level helpers for the 2-color grid. rasterize() is what the
 // transmitter puts on screen; sampleAxisAligned() reads a straight-on
-// screenshot back into modules. Camera frames (perspective, blur) need the
-// finder + homography path planned for Day 3; this is the lossless baseline.
+// screenshot back into modules. Camera frames (perspective, blur) go through
+// readFrame in vision.ts; this is the lossless baseline.
 
 import { GRID_SIZE, type Modules } from './grid.ts';
 

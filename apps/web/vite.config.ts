@@ -2,9 +2,16 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
-export default defineConfig({
+// `--mode lan` serves over self-signed HTTPS on the LAN: phones only grant
+// camera access to secure origins.
+export default defineConfig(({ mode }) => ({
+  // GitHub Pages serves the app under /<repo>/; the deploy workflow sets BASE.
+  base: process.env.BASE ?? '/',
+  worker: { format: 'es' },
   plugins: [
+    mode === 'lan' && basicSsl(),
     react(),
     tailwindcss(),
     VitePWA({
@@ -21,4 +28,4 @@ export default defineConfig({
       },
     }),
   ],
-});
+}));

@@ -13,3 +13,7 @@ export {
   type Modules,
 } from './grid.ts';
 export { rasterize, sampleAxisAligned, DARK_RGB, LIGHT_RGB, type RgbaImage } from './raster.ts';
+export { readFrame, findFinders, sampleModules, toGray, type FrameRead, type Finder, type GrayImage } from './vision.ts';
+export { solveHomography, applyHomography, type Homography, type Point } from './homography.ts';
+export { sha256, toHex } from './sha256.ts';
+export { sealEnvelope, openEnvelope, ENVELOPE_VERSION, type OpenedEnvelope } from './envelope.ts';

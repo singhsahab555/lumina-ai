@@ -38,7 +38,7 @@
 | Offline verifier agent | **Muse Glimmer 30B via Ollama**, local on the air-gapped receiver | Open weights (Apache 2.0) with no network needed. It checks bundles against local policy, flags injections, and rehydrates them into an actionable view. Needs a laptop with a GPU or ≥32 GB of unified memory. A phone can't run it, so phones receive in raw mode only. |
 | Encryption | WebCrypto AES-256-GCM. The key comes from ECDH (Mode 3 bidirectional) or a passphrase via PBKDF2 | Built into the browser, with no crypto dependencies. |
 | Modulation | 2-color (1 bit/module) baseline, 8-color (3 bit/module) when calibration passes | Adaptive. The receiver falls back to 2-color under glare. |
-| Geometry | Classical finder patterns + OpenCV.js `findHomography` / `warpPerspective` on every frame | Deterministic and fast enough for every frame. |
+| Geometry | Classical finder patterns + 4-point homography in plain TypeScript ([vision.ts](../packages/lumina-protocol/src/vision.ts)), in a Web Worker | Deterministic, ~30 ms per 720p frame, no 8 MB OpenCV.js download, and unit-testable in Node. |
 | SAM 3.1 | Meta Model API, **connected side only**: a text prompt ("computer monitor") acquires and tracks the far screen for the return channel (Mode 3), plus a glare mask. **Not run on every frame** | API-only, so it can't run on the air-gapped side. It provides the ROI at ~1–2 Hz, and the cheap tracker does the per-frame work. |
 
 ## Model integration (`packages/lumina-agents`)
@@ -84,5 +84,11 @@ Report *measured* KB/s in the UI. "Effective semantic throughput" can be shown a
 See [packages/lumina-protocol/src/packet.ts](../packages/lumina-protocol/src/packet.ts). It uses a 16-byte header (magic, version, session id, total length, block size, seed), the droplet data, and a CRC-32.
 
 Each packet fills one 2-color symbol: see [grid.ts](../packages/lumina-protocol/src/grid.ts). The grid is 64×64 modules with four 7×7 finders (bottom-right one has a hollow core, for orientation) and 3,840 data modules = 480 B, so the max block size is 460 B. Data bits are XORed with a fixed PRNG mask so padding never renders as solid blocks. Raw-mode payloads are deflate-raw; the receiver inflates after LT decode.
+
+The LT payload is a file envelope ([envelope.ts](../packages/lumina-protocol/src/envelope.ts)): magic `LUMF`, version, SHA-256 of the file, name, then the bytes, all deflated. The receiver recomputes SHA-256 and only shows "verified" on a match. SHA-256 is implemented in TS because `crypto.subtle` is missing on non-secure (plain LAN http) pages.
+
+### Receiver pipeline
+
+Camera frame (downscaled to ≤1280 px) → worker → luma → Bradley adaptive threshold (12% and ≥12 levels below local mean) → 4-connected components → finder = dark ring whose hole holds a separate dark core (core/ring area ≈ 9/24 plain, 1/24 marked) → BR is the marked finder, TL the plain one farthest from it, TR/BL by cross product (a mirrored assignment is also tried) → homography from the four core centroids → sample each module (5 taps) → threshold against the 9×9-module local mean → packet → CRC. Only CRC-valid packets reach the per-session LT decoder, so torn rolling-shutter frames are just erasures. Measured limits on synthetic frames: needs ≥4 px/module; tolerates blur up to ~½ module, any rotation, keystone, 35% brightness gradient.
 
 Planned v2 header fields: payload type (raw / neural-json / handshake), compression flag, encryption flag, and a SHA-256 manifest carried in a dedicated frame.
