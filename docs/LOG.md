@@ -13,7 +13,9 @@ Measured numbers per day. Newest first.
 - **Browser e2e** (`npm run e2e`): Edge with a fake webcam fed a Y4M of tilted, blurred, noisy frames (each symbol twice, every 5th frame torn). The 56,190 B shift log (K = 11) came back **SHA-256 verified, byte-exact** via the real download button in ~3 to 4 s.
 - LAN: `npm run lan` serves the built app over self-signed HTTPS (phones only allow the camera on secure origins).
 - Tests: protocol 19/19, web 5/5, agents 16/16.
-- **Still to do for the milestone:** the physical laptop → phone run in airplane mode (needs the user's phone). Known risk: the self-signed cert stops the service worker installing on the phone, so the page must be loaded before airplane mode is turned on. A proper HTTPS host (GitHub Pages) fixes this once the repo is pushed.
+- Deployed to GitHub Pages (https://singhsahab555.github.io/lumina-ai/) via `.github/workflows/pages.yml`: a real HTTPS origin, so phones grant the camera and install the PWA offline. Self-signed LAN HTTPS got the camera blocked on the phone.
+- CI caught a repo bug: `.gitignore`'s `models/` (meant for weights) had been hiding `packages/lumina-agents/src/models/`. Now tracked.
+- 🎯 **MILESTONE reached (Oct 27):** laptop screen → phone camera, phone offline, **two HTML files transferred and SHA-256 verified**. It needed a symbol rate below 30/s on the real camera (30/s works in the synthetic e2e only). Day 9 hardening: measure the best real-camera rate and throughput, and tune for it.
 
 ## Day 2+: Tue Oct 27, Meta model groundwork
 
