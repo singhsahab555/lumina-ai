@@ -1,0 +1,874 @@
+NORTH BASIN WATER TREATMENT, PUMP STATION PS-07
+SHIFT LOG AND MAINTENANCE RECORD, 2026-09-09 .. 2026-10-23 (SYNTHETIC DEMO DATA)
+Assets: P-07A, P-07B (75 kW centrifugal), VFD D-07A/D-07B, HMI-07 (air-gapped OT segment)
+
+[2026-09-09 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 445 m3/h, discharge 5.4 bar, vib 2.0 mm/s, DE bearing 50 C; P-07B flow 428 m3/h, vib 2.6 mm/s, DE bearing 54 C.
+  Chlorine residual sample taken and logged at outlet.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Sump level cycling normally, float switches verified.
+[2026-09-09 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 426 m3/h, discharge 5.4 bar, vib 1.6 mm/s, DE bearing 48 C; P-07B flow 445 m3/h, vib 2.2 mm/s, DE bearing 57 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Inlet screen differential nominal, no cleaning required.
+  Sump level cycling normally, float switches verified.
+  Generator weekly no-load test run 15 min, OK.
+[2026-09-09 22:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 412 m3/h, discharge 5.5 bar, vib 2.3 mm/s, DE bearing 46 C; P-07B flow 412 m3/h, vib 2.8 mm/s, DE bearing 47 C.
+  Sump level cycling normally, float switches verified.
+  Panel room temperature within range, HVAC running.
+  Inlet screen differential nominal, no cleaning required.
+  Valve V-07-3 stroked open/close for exercise, OK.
+
+[2026-09-10 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 438 m3/h, discharge 5.2 bar, vib 2.5 mm/s, DE bearing 52 C; P-07B flow 443 m3/h, vib 2.5 mm/s, DE bearing 54 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-09-10 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 440 m3/h, discharge 5.6 bar, vib 1.7 mm/s, DE bearing 46 C; P-07B flow 439 m3/h, vib 2.1 mm/s, DE bearing 47 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Sump level cycling normally, float switches verified.
+  Panel room temperature within range, HVAC running.
+  Valve V-07-3 stroked open/close for exercise, OK.
+[2026-09-10 22:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 434 m3/h, discharge 5.4 bar, vib 1.6 mm/s, DE bearing 44 C; P-07B flow 418 m3/h, vib 1.9 mm/s, DE bearing 46 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Chlorine residual sample taken and logged at outlet.
+  Panel room temperature within range, HVAC running.
+  Inlet screen differential nominal, no cleaning required.
+
+[2026-09-11 06:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 440 m3/h, discharge 5.5 bar, vib 2.2 mm/s, DE bearing 49 C; P-07B flow 430 m3/h, vib 2.8 mm/s, DE bearing 56 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Chlorine residual sample taken and logged at outlet.
+  Valve V-07-3 stroked open/close for exercise, OK.
+[2026-09-11 14:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 413 m3/h, discharge 5.5 bar, vib 2.5 mm/s, DE bearing 49 C; P-07B flow 408 m3/h, vib 2.7 mm/s, DE bearing 49 C.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Sump level cycling normally, float switches verified.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-09-11 22:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 440 m3/h, discharge 5.7 bar, vib 2.2 mm/s, DE bearing 44 C; P-07B flow 414 m3/h, vib 2.4 mm/s, DE bearing 48 C.
+  Sump level cycling normally, float switches verified.
+  Panel room temperature within range, HVAC running.
+  Sump level cycling normally, float switches verified.
+  Generator weekly no-load test run 15 min, OK.
+
+[2026-09-12 06:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 445 m3/h, discharge 5.2 bar, vib 2.0 mm/s, DE bearing 44 C; P-07B flow 434 m3/h, vib 2.8 mm/s, DE bearing 49 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Generator weekly no-load test run 15 min, OK.
+  Chlorine residual sample taken and logged at outlet.
+[2026-09-12 14:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 422 m3/h, discharge 5.2 bar, vib 2.3 mm/s, DE bearing 46 C; P-07B flow 414 m3/h, vib 2.8 mm/s, DE bearing 53 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Panel room temperature within range, HVAC running.
+  Sump level cycling normally, float switches verified.
+  Panel room temperature within range, HVAC running.
+[2026-09-12 22:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 429 m3/h, discharge 5.3 bar, vib 2.0 mm/s, DE bearing 48 C; P-07B flow 422 m3/h, vib 2.4 mm/s, DE bearing 46 C.
+  Sump level cycling normally, float switches verified.
+  Generator weekly no-load test run 15 min, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Panel room temperature within range, HVAC running.
+
+[2026-09-13 06:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 436 m3/h, discharge 5.3 bar, vib 2.0 mm/s, DE bearing 47 C; P-07B flow 448 m3/h, vib 1.9 mm/s, DE bearing 55 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Generator weekly no-load test run 15 min, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Generator weekly no-load test run 15 min, OK.
+[2026-09-13 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 451 m3/h, discharge 5.7 bar, vib 2.2 mm/s, DE bearing 44 C; P-07B flow 421 m3/h, vib 2.0 mm/s, DE bearing 54 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Generator weekly no-load test run 15 min, OK.
+  Generator weekly no-load test run 15 min, OK.
+  Sump level cycling normally, float switches verified.
+[2026-09-13 22:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 411 m3/h, discharge 5.2 bar, vib 2.2 mm/s, DE bearing 51 C; P-07B flow 433 m3/h, vib 2.0 mm/s, DE bearing 58 C.
+  Inlet screen differential nominal, no cleaning required.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Generator weekly no-load test run 15 min, OK.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+
+[2026-09-14 06:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 424 m3/h, discharge 5.5 bar, vib 2.6 mm/s, DE bearing 46 C; P-07B flow 412 m3/h, vib 2.6 mm/s, DE bearing 58 C.
+  Panel room temperature within range, HVAC running.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Panel room temperature within range, HVAC running.
+  Sump level cycling normally, float switches verified.
+[2026-09-14 14:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 417 m3/h, discharge 5.5 bar, vib 1.8 mm/s, DE bearing 51 C; P-07B flow 426 m3/h, vib 2.2 mm/s, DE bearing 50 C.
+  Inlet screen differential nominal, no cleaning required.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Inlet screen differential nominal, no cleaning required.
+  Valve V-07-3 stroked open/close for exercise, OK.
+[2026-09-14 22:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 419 m3/h, discharge 5.2 bar, vib 1.6 mm/s, DE bearing 49 C; P-07B flow 447 m3/h, vib 2.2 mm/s, DE bearing 54 C.
+  Panel room temperature within range, HVAC running.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+
+[2026-09-15 06:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 448 m3/h, discharge 5.4 bar, vib 1.7 mm/s, DE bearing 49 C; P-07B flow 408 m3/h, vib 1.9 mm/s, DE bearing 57 C.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Chlorine residual sample taken and logged at outlet.
+  Chlorine residual sample taken and logged at outlet.
+[2026-09-15 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 413 m3/h, discharge 5.3 bar, vib 1.7 mm/s, DE bearing 44 C; P-07B flow 435 m3/h, vib 2.6 mm/s, DE bearing 52 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Chlorine residual sample taken and logged at outlet.
+  Generator weekly no-load test run 15 min, OK.
+[2026-09-15 22:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 437 m3/h, discharge 5.4 bar, vib 2.1 mm/s, DE bearing 52 C; P-07B flow 410 m3/h, vib 2.6 mm/s, DE bearing 46 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Generator weekly no-load test run 15 min, OK.
+  Sump level cycling normally, float switches verified.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+
+[2026-09-16 06:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 454 m3/h, discharge 5.4 bar, vib 2.1 mm/s, DE bearing 51 C; P-07B flow 431 m3/h, vib 2.7 mm/s, DE bearing 49 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Chlorine residual sample taken and logged at outlet.
+  Inlet screen differential nominal, no cleaning required.
+  Inlet screen differential nominal, no cleaning required.
+[2026-09-16 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 454 m3/h, discharge 5.3 bar, vib 1.7 mm/s, DE bearing 50 C; P-07B flow 449 m3/h, vib 2.7 mm/s, DE bearing 48 C.
+  Generator weekly no-load test run 15 min, OK.
+  Chlorine residual sample taken and logged at outlet.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Panel room temperature within range, HVAC running.
+[2026-09-16 22:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 427 m3/h, discharge 5.4 bar, vib 1.6 mm/s, DE bearing 49 C; P-07B flow 437 m3/h, vib 2.3 mm/s, DE bearing 47 C.
+  Generator weekly no-load test run 15 min, OK.
+  Panel room temperature within range, HVAC running.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+
+[2026-09-17 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 422 m3/h, discharge 5.6 bar, vib 1.9 mm/s, DE bearing 45 C; P-07B flow 441 m3/h, vib 1.9 mm/s, DE bearing 47 C.
+  Chlorine residual sample taken and logged at outlet.
+  Generator weekly no-load test run 15 min, OK.
+  Generator weekly no-load test run 15 min, OK.
+  Sump level cycling normally, float switches verified.
+[2026-09-17 14:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 416 m3/h, discharge 5.3 bar, vib 1.8 mm/s, DE bearing 49 C; P-07B flow 440 m3/h, vib 2.6 mm/s, DE bearing 49 C.
+  Generator weekly no-load test run 15 min, OK.
+  Inlet screen differential nominal, no cleaning required.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Sump level cycling normally, float switches verified.
+[2026-09-17 22:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 430 m3/h, discharge 5.5 bar, vib 2.2 mm/s, DE bearing 51 C; P-07B flow 430 m3/h, vib 2.6 mm/s, DE bearing 57 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Generator weekly no-load test run 15 min, OK.
+  Panel room temperature within range, HVAC running.
+  Generator weekly no-load test run 15 min, OK.
+
+[2026-09-18 06:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 443 m3/h, discharge 5.4 bar, vib 2.3 mm/s, DE bearing 50 C; P-07B flow 410 m3/h, vib 2.7 mm/s, DE bearing 46 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Panel room temperature within range, HVAC running.
+  Inlet screen differential nominal, no cleaning required.
+  Panel room temperature within range, HVAC running.
+[2026-09-18 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 414 m3/h, discharge 5.6 bar, vib 2.4 mm/s, DE bearing 51 C; P-07B flow 425 m3/h, vib 2.9 mm/s, DE bearing 54 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-09-18 22:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 441 m3/h, discharge 5.2 bar, vib 2.3 mm/s, DE bearing 46 C; P-07B flow 442 m3/h, vib 2.5 mm/s, DE bearing 58 C.
+  Generator weekly no-load test run 15 min, OK.
+  Sump level cycling normally, float switches verified.
+  Inlet screen differential nominal, no cleaning required.
+  Valve V-07-3 stroked open/close for exercise, OK.
+
+[2026-09-19 06:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 444 m3/h, discharge 5.3 bar, vib 1.8 mm/s, DE bearing 48 C; P-07B flow 422 m3/h, vib 1.9 mm/s, DE bearing 49 C.
+  Chlorine residual sample taken and logged at outlet.
+  Generator weekly no-load test run 15 min, OK.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Generator weekly no-load test run 15 min, OK.
+[2026-09-19 14:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 415 m3/h, discharge 5.5 bar, vib 1.9 mm/s, DE bearing 50 C; P-07B flow 415 m3/h, vib 2.4 mm/s, DE bearing 46 C.
+  Panel room temperature within range, HVAC running.
+  Inlet screen differential nominal, no cleaning required.
+  Sump level cycling normally, float switches verified.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-09-19 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 422 m3/h, discharge 5.3 bar, vib 1.9 mm/s, DE bearing 50 C; P-07B flow 434 m3/h, vib 1.8 mm/s, DE bearing 57 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Panel room temperature within range, HVAC running.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+
+[2026-09-20 06:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 430 m3/h, discharge 5.5 bar, vib 2.4 mm/s, DE bearing 45 C; P-07B flow 421 m3/h, vib 2.5 mm/s, DE bearing 57 C.
+  Generator weekly no-load test run 15 min, OK.
+  Generator weekly no-load test run 15 min, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-09-20 14:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 427 m3/h, discharge 5.2 bar, vib 2.2 mm/s, DE bearing 44 C; P-07B flow 444 m3/h, vib 2.7 mm/s, DE bearing 51 C.
+  Inlet screen differential nominal, no cleaning required.
+  Generator weekly no-load test run 15 min, OK.
+  Inlet screen differential nominal, no cleaning required.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-09-20 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 431 m3/h, discharge 5.5 bar, vib 2.2 mm/s, DE bearing 51 C; P-07B flow 436 m3/h, vib 2.2 mm/s, DE bearing 53 C.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Panel room temperature within range, HVAC running.
+  Panel room temperature within range, HVAC running.
+
+[2026-09-21 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 439 m3/h, discharge 5.6 bar, vib 2.4 mm/s, DE bearing 51 C; P-07B flow 410 m3/h, vib 2.0 mm/s, DE bearing 51 C.
+  Generator weekly no-load test run 15 min, OK.
+  Panel room temperature within range, HVAC running.
+  Chlorine residual sample taken and logged at outlet.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-09-21 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 429 m3/h, discharge 5.3 bar, vib 1.8 mm/s, DE bearing 49 C; P-07B flow 408 m3/h, vib 2.8 mm/s, DE bearing 55 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Sump level cycling normally, float switches verified.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-09-21 22:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 424 m3/h, discharge 5.7 bar, vib 2.6 mm/s, DE bearing 47 C; P-07B flow 450 m3/h, vib 1.9 mm/s, DE bearing 54 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Generator weekly no-load test run 15 min, OK.
+  Sump level cycling normally, float switches verified.
+
+[2026-09-22 06:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 424 m3/h, discharge 5.6 bar, vib 2.4 mm/s, DE bearing 48 C; P-07B flow 441 m3/h, vib 2.3 mm/s, DE bearing 48 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Chlorine residual sample taken and logged at outlet.
+  Inlet screen differential nominal, no cleaning required.
+[2026-09-22 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 434 m3/h, discharge 5.4 bar, vib 2.0 mm/s, DE bearing 51 C; P-07B flow 420 m3/h, vib 2.8 mm/s, DE bearing 53 C.
+  Sump level cycling normally, float switches verified.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Chlorine residual sample taken and logged at outlet.
+[2026-09-22 22:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 431 m3/h, discharge 5.3 bar, vib 2.4 mm/s, DE bearing 45 C; P-07B flow 407 m3/h, vib 2.3 mm/s, DE bearing 46 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+
+[2026-09-23 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 441 m3/h, discharge 5.3 bar, vib 2.5 mm/s, DE bearing 51 C; P-07B flow 435 m3/h, vib 1.8 mm/s, DE bearing 52 C.
+  Inlet screen differential nominal, no cleaning required.
+  Inlet screen differential nominal, no cleaning required.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Panel room temperature within range, HVAC running.
+[2026-09-23 14:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 421 m3/h, discharge 5.1 bar, vib 2.5 mm/s, DE bearing 48 C; P-07B flow 412 m3/h, vib 2.1 mm/s, DE bearing 52 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Sump level cycling normally, float switches verified.
+  Panel room temperature within range, HVAC running.
+  Valve V-07-3 stroked open/close for exercise, OK.
+[2026-09-23 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 455 m3/h, discharge 5.5 bar, vib 2.6 mm/s, DE bearing 50 C; P-07B flow 410 m3/h, vib 2.8 mm/s, DE bearing 55 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Sump level cycling normally, float switches verified.
+  Generator weekly no-load test run 15 min, OK.
+
+[2026-09-24 06:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 450 m3/h, discharge 5.1 bar, vib 2.1 mm/s, DE bearing 48 C; P-07B flow 428 m3/h, vib 2.2 mm/s, DE bearing 48 C.
+  Generator weekly no-load test run 15 min, OK.
+  Panel room temperature within range, HVAC running.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Sump level cycling normally, float switches verified.
+[2026-09-24 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 421 m3/h, discharge 5.6 bar, vib 2.2 mm/s, DE bearing 45 C; P-07B flow 424 m3/h, vib 1.8 mm/s, DE bearing 47 C.
+  Generator weekly no-load test run 15 min, OK.
+  Sump level cycling normally, float switches verified.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Chlorine residual sample taken and logged at outlet.
+[2026-09-24 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 438 m3/h, discharge 5.2 bar, vib 1.9 mm/s, DE bearing 49 C; P-07B flow 415 m3/h, vib 2.5 mm/s, DE bearing 47 C.
+  Panel room temperature within range, HVAC running.
+  Generator weekly no-load test run 15 min, OK.
+  Chlorine residual sample taken and logged at outlet.
+  Valve V-07-3 stroked open/close for exercise, OK.
+
+[2026-09-25 06:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 439 m3/h, discharge 5.6 bar, vib 2.4 mm/s, DE bearing 49 C; P-07B flow 411 m3/h, vib 2.7 mm/s, DE bearing 53 C.
+  Chlorine residual sample taken and logged at outlet.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-09-25 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 452 m3/h, discharge 5.6 bar, vib 2.2 mm/s, DE bearing 45 C; P-07B flow 419 m3/h, vib 2.0 mm/s, DE bearing 47 C.
+  Chlorine residual sample taken and logged at outlet.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Sump level cycling normally, float switches verified.
+[2026-09-25 22:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 411 m3/h, discharge 5.7 bar, vib 2.5 mm/s, DE bearing 48 C; P-07B flow 448 m3/h, vib 2.0 mm/s, DE bearing 56 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Sump level cycling normally, float switches verified.
+  Generator weekly no-load test run 15 min, OK.
+  Panel room temperature within range, HVAC running.
+
+[2026-09-26 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 455 m3/h, discharge 5.2 bar, vib 2.2 mm/s, DE bearing 48 C; P-07B flow 444 m3/h, vib 2.1 mm/s, DE bearing 50 C.
+  Inlet screen differential nominal, no cleaning required.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-09-26 14:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 412 m3/h, discharge 5.2 bar, vib 2.6 mm/s, DE bearing 48 C; P-07B flow 426 m3/h, vib 1.9 mm/s, DE bearing 52 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Inlet screen differential nominal, no cleaning required.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Valve V-07-3 stroked open/close for exercise, OK.
+[2026-09-26 22:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 426 m3/h, discharge 5.5 bar, vib 2.0 mm/s, DE bearing 50 C; P-07B flow 427 m3/h, vib 2.6 mm/s, DE bearing 57 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Chlorine residual sample taken and logged at outlet.
+  Generator weekly no-load test run 15 min, OK.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+
+[2026-09-27 06:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 446 m3/h, discharge 5.4 bar, vib 1.8 mm/s, DE bearing 51 C; P-07B flow 436 m3/h, vib 2.5 mm/s, DE bearing 47 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Sump level cycling normally, float switches verified.
+  Inlet screen differential nominal, no cleaning required.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-09-27 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 442 m3/h, discharge 5.5 bar, vib 2.2 mm/s, DE bearing 50 C; P-07B flow 448 m3/h, vib 2.7 mm/s, DE bearing 57 C.
+  Panel room temperature within range, HVAC running.
+  Generator weekly no-load test run 15 min, OK.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Valve V-07-3 stroked open/close for exercise, OK.
+[2026-09-27 22:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 427 m3/h, discharge 5.1 bar, vib 1.7 mm/s, DE bearing 47 C; P-07B flow 415 m3/h, vib 1.9 mm/s, DE bearing 56 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Generator weekly no-load test run 15 min, OK.
+  Chlorine residual sample taken and logged at outlet.
+  Valve V-07-3 stroked open/close for exercise, OK.
+
+[2026-09-28 06:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 410 m3/h, discharge 5.4 bar, vib 2.4 mm/s, DE bearing 45 C; P-07B flow 445 m3/h, vib 2.0 mm/s, DE bearing 46 C.
+  Chlorine residual sample taken and logged at outlet.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Inlet screen differential nominal, no cleaning required.
+[2026-09-28 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 444 m3/h, discharge 5.1 bar, vib 2.1 mm/s, DE bearing 44 C; P-07B flow 418 m3/h, vib 2.7 mm/s, DE bearing 48 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Sump level cycling normally, float switches verified.
+[2026-09-28 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 434 m3/h, discharge 5.6 bar, vib 2.1 mm/s, DE bearing 51 C; P-07B flow 444 m3/h, vib 2.4 mm/s, DE bearing 57 C.
+  Chlorine residual sample taken and logged at outlet.
+  Chlorine residual sample taken and logged at outlet.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Valve V-07-3 stroked open/close for exercise, OK.
+
+[2026-09-29 06:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 450 m3/h, discharge 5.7 bar, vib 2.1 mm/s, DE bearing 47 C; P-07B flow 407 m3/h, vib 2.1 mm/s, DE bearing 47 C.
+  Generator weekly no-load test run 15 min, OK.
+  Sump level cycling normally, float switches verified.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Chlorine residual sample taken and logged at outlet.
+[2026-09-29 14:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 428 m3/h, discharge 5.1 bar, vib 2.4 mm/s, DE bearing 51 C; P-07B flow 431 m3/h, vib 2.8 mm/s, DE bearing 56 C.
+  Generator weekly no-load test run 15 min, OK.
+  Chlorine residual sample taken and logged at outlet.
+  Panel room temperature within range, HVAC running.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-09-29 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 452 m3/h, discharge 5.7 bar, vib 1.6 mm/s, DE bearing 50 C; P-07B flow 416 m3/h, vib 2.6 mm/s, DE bearing 48 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Chlorine residual sample taken and logged at outlet.
+  Inlet screen differential nominal, no cleaning required.
+
+[2026-09-30 06:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 415 m3/h, discharge 5.3 bar, vib 1.6 mm/s, DE bearing 46 C; P-07B flow 411 m3/h, vib 2.8 mm/s, DE bearing 52 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Generator weekly no-load test run 15 min, OK.
+[2026-09-30 14:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 438 m3/h, discharge 5.1 bar, vib 2.1 mm/s, DE bearing 47 C; P-07B flow 438 m3/h, vib 2.4 mm/s, DE bearing 54 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Panel room temperature within range, HVAC running.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Sump level cycling normally, float switches verified.
+[2026-09-30 22:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 422 m3/h, discharge 5.6 bar, vib 2.0 mm/s, DE bearing 46 C; P-07B flow 433 m3/h, vib 2.7 mm/s, DE bearing 53 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Panel room temperature within range, HVAC running.
+
+[2026-10-01 06:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 451 m3/h, discharge 5.6 bar, vib 1.9 mm/s, DE bearing 50 C; P-07B flow 427 m3/h, vib 2.2 mm/s, DE bearing 52 C.
+  Generator weekly no-load test run 15 min, OK.
+  Inlet screen differential nominal, no cleaning required.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Chlorine residual sample taken and logged at outlet.
+[2026-10-01 14:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 437 m3/h, discharge 5.7 bar, vib 1.8 mm/s, DE bearing 44 C; P-07B flow 445 m3/h, vib 1.8 mm/s, DE bearing 46 C.
+  Chlorine residual sample taken and logged at outlet.
+  Sump level cycling normally, float switches verified.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Chlorine residual sample taken and logged at outlet.
+[2026-10-01 22:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 445 m3/h, discharge 5.3 bar, vib 1.8 mm/s, DE bearing 47 C; P-07B flow 437 m3/h, vib 2.8 mm/s, DE bearing 51 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Inlet screen differential nominal, no cleaning required.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Generator weekly no-load test run 15 min, OK.
+
+[2026-10-02 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 414 m3/h, discharge 5.4 bar, vib 1.8 mm/s, DE bearing 47 C; P-07B flow 425 m3/h, vib 2.5 mm/s, DE bearing 58 C.
+  Generator weekly no-load test run 15 min, OK.
+  Generator weekly no-load test run 15 min, OK.
+  Chlorine residual sample taken and logged at outlet.
+  Generator weekly no-load test run 15 min, OK.
+[2026-10-02 14:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 421 m3/h, discharge 5.1 bar, vib 1.8 mm/s, DE bearing 46 C; P-07B flow 447 m3/h, vib 2.8 mm/s, DE bearing 45 C.
+  Panel room temperature within range, HVAC running.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Inlet screen differential nominal, no cleaning required.
+  Inlet screen differential nominal, no cleaning required.
+[2026-10-02 22:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 421 m3/h, discharge 5.6 bar, vib 2.4 mm/s, DE bearing 48 C; P-07B flow 430 m3/h, vib 2.6 mm/s, DE bearing 50 C.
+  Panel room temperature within range, HVAC running.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Sump level cycling normally, float switches verified.
+  Valve V-07-3 stroked open/close for exercise, OK.
+
+[2026-10-03 06:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 432 m3/h, discharge 5.2 bar, vib 2.2 mm/s, DE bearing 46 C; P-07B flow 435 m3/h, vib 2.2 mm/s, DE bearing 57 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Sump level cycling normally, float switches verified.
+[2026-10-03 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 442 m3/h, discharge 5.2 bar, vib 2.1 mm/s, DE bearing 46 C; P-07B flow 430 m3/h, vib 2.5 mm/s, DE bearing 49 C.
+  Generator weekly no-load test run 15 min, OK.
+  Panel room temperature within range, HVAC running.
+  Panel room temperature within range, HVAC running.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-10-03 22:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 418 m3/h, discharge 5.5 bar, vib 1.9 mm/s, DE bearing 51 C; P-07B flow 448 m3/h, vib 1.8 mm/s, DE bearing 52 C.
+  Chlorine residual sample taken and logged at outlet.
+  Inlet screen differential nominal, no cleaning required.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+
+[2026-10-04 06:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 450 m3/h, discharge 5.4 bar, vib 1.7 mm/s, DE bearing 49 C; P-07B flow 420 m3/h, vib 1.8 mm/s, DE bearing 48 C.
+  Inlet screen differential nominal, no cleaning required.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Generator weekly no-load test run 15 min, OK.
+[2026-10-04 14:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 417 m3/h, discharge 5.3 bar, vib 2.4 mm/s, DE bearing 51 C; P-07B flow 412 m3/h, vib 2.0 mm/s, DE bearing 57 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Chlorine residual sample taken and logged at outlet.
+[2026-10-04 22:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 449 m3/h, discharge 5.3 bar, vib 1.8 mm/s, DE bearing 46 C; P-07B flow 449 m3/h, vib 2.1 mm/s, DE bearing 57 C.
+  Panel room temperature within range, HVAC running.
+  Sump level cycling normally, float switches verified.
+  Inlet screen differential nominal, no cleaning required.
+  Generator weekly no-load test run 15 min, OK.
+
+[2026-10-05 06:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 412 m3/h, discharge 5.2 bar, vib 1.9 mm/s, DE bearing 48 C; P-07B flow 407 m3/h, vib 2.4 mm/s, DE bearing 45 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Sump level cycling normally, float switches verified.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-10-05 14:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 434 m3/h, discharge 5.3 bar, vib 2.6 mm/s, DE bearing 50 C; P-07B flow 438 m3/h, vib 2.2 mm/s, DE bearing 48 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Inlet screen differential nominal, no cleaning required.
+  Generator weekly no-load test run 15 min, OK.
+  Valve V-07-3 stroked open/close for exercise, OK.
+[2026-10-05 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 420 m3/h, discharge 5.5 bar, vib 2.5 mm/s, DE bearing 49 C; P-07B flow 406 m3/h, vib 2.8 mm/s, DE bearing 46 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Sump level cycling normally, float switches verified.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Panel room temperature within range, HVAC running.
+
+[2026-10-06 06:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 445 m3/h, discharge 5.6 bar, vib 2.3 mm/s, DE bearing 51 C; P-07B flow 446 m3/h, vib 1.9 mm/s, DE bearing 50 C.
+  Sump level cycling normally, float switches verified.
+  Inlet screen differential nominal, no cleaning required.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Sump level cycling normally, float switches verified.
+[2026-10-06 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 452 m3/h, discharge 5.3 bar, vib 2.6 mm/s, DE bearing 44 C; P-07B flow 422 m3/h, vib 1.9 mm/s, DE bearing 45 C.
+  Sump level cycling normally, float switches verified.
+  Generator weekly no-load test run 15 min, OK.
+  Generator weekly no-load test run 15 min, OK.
+  Generator weekly no-load test run 15 min, OK.
+[2026-10-06 22:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 454 m3/h, discharge 5.3 bar, vib 1.8 mm/s, DE bearing 51 C; P-07B flow 416 m3/h, vib 2.8 mm/s, DE bearing 54 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Sump level cycling normally, float switches verified.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+
+[2026-10-07 06:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 437 m3/h, discharge 5.7 bar, vib 1.7 mm/s, DE bearing 47 C; P-07B flow 408 m3/h, vib 2.4 mm/s, DE bearing 48 C.
+  Chlorine residual sample taken and logged at outlet.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Inlet screen differential nominal, no cleaning required.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-10-07 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 439 m3/h, discharge 5.2 bar, vib 2.3 mm/s, DE bearing 45 C; P-07B flow 415 m3/h, vib 2.5 mm/s, DE bearing 57 C.
+  Inlet screen differential nominal, no cleaning required.
+  Generator weekly no-load test run 15 min, OK.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-10-07 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 421 m3/h, discharge 5.6 bar, vib 1.9 mm/s, DE bearing 46 C; P-07B flow 419 m3/h, vib 1.8 mm/s, DE bearing 55 C.
+  Generator weekly no-load test run 15 min, OK.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Sump level cycling normally, float switches verified.
+  Inlet screen differential nominal, no cleaning required.
+
+[2026-10-08 06:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 422 m3/h, discharge 5.5 bar, vib 1.9 mm/s, DE bearing 44 C; P-07B flow 440 m3/h, vib 2.8 mm/s, DE bearing 54 C.
+  Inlet screen differential nominal, no cleaning required.
+  Panel room temperature within range, HVAC running.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Panel room temperature within range, HVAC running.
+[2026-10-08 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 422 m3/h, discharge 5.4 bar, vib 2.5 mm/s, DE bearing 46 C; P-07B flow 433 m3/h, vib 1.8 mm/s, DE bearing 55 C.
+  Inlet screen differential nominal, no cleaning required.
+  Sump level cycling normally, float switches verified.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Sump level cycling normally, float switches verified.
+[2026-10-08 22:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 424 m3/h, discharge 5.2 bar, vib 2.5 mm/s, DE bearing 49 C; P-07B flow 407 m3/h, vib 1.9 mm/s, DE bearing 55 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Valve V-07-3 stroked open/close for exercise, OK.
+
+[2026-10-09 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 420 m3/h, discharge 5.5 bar, vib 2.2 mm/s, DE bearing 49 C; P-07B flow 448 m3/h, vib 2.2 mm/s, DE bearing 54 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Sump level cycling normally, float switches verified.
+  Sump level cycling normally, float switches verified.
+[2026-10-09 14:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 427 m3/h, discharge 5.3 bar, vib 2.2 mm/s, DE bearing 45 C; P-07B flow 421 m3/h, vib 2.8 mm/s, DE bearing 49 C.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Panel room temperature within range, HVAC running.
+[2026-10-09 22:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 450 m3/h, discharge 5.5 bar, vib 2.5 mm/s, DE bearing 47 C; P-07B flow 406 m3/h, vib 2.5 mm/s, DE bearing 54 C.
+  Chlorine residual sample taken and logged at outlet.
+  Panel room temperature within range, HVAC running.
+  Generator weekly no-load test run 15 min, OK.
+  Panel room temperature within range, HVAC running.
+
+[2026-10-10 06:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 442 m3/h, discharge 5.4 bar, vib 2.5 mm/s, DE bearing 48 C; P-07B flow 422 m3/h, vib 2.2 mm/s, DE bearing 48 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-10-10 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 433 m3/h, discharge 5.1 bar, vib 1.7 mm/s, DE bearing 52 C; P-07B flow 442 m3/h, vib 2.4 mm/s, DE bearing 54 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Panel room temperature within range, HVAC running.
+  Inlet screen differential nominal, no cleaning required.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-10-10 22:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 441 m3/h, discharge 5.6 bar, vib 2.1 mm/s, DE bearing 46 C; P-07B flow 429 m3/h, vib 2.4 mm/s, DE bearing 45 C.
+  Sump level cycling normally, float switches verified.
+  Sump level cycling normally, float switches verified.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Generator weekly no-load test run 15 min, OK.
+
+[2026-10-11 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 421 m3/h, discharge 5.3 bar, vib 1.8 mm/s, DE bearing 52 C; P-07B flow 418 m3/h, vib 1.8 mm/s, DE bearing 50 C.
+  Generator weekly no-load test run 15 min, OK.
+  Sump level cycling normally, float switches verified.
+  Generator weekly no-load test run 15 min, OK.
+  Chlorine residual sample taken and logged at outlet.
+[2026-10-11 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 436 m3/h, discharge 5.5 bar, vib 1.8 mm/s, DE bearing 45 C; P-07B flow 429 m3/h, vib 2.2 mm/s, DE bearing 47 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Sump level cycling normally, float switches verified.
+  Chlorine residual sample taken and logged at outlet.
+[2026-10-11 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 443 m3/h, discharge 5.7 bar, vib 2.3 mm/s, DE bearing 48 C; P-07B flow 417 m3/h, vib 2.8 mm/s, DE bearing 50 C.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Inlet screen differential nominal, no cleaning required.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+
+[2026-10-12 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 435 m3/h, discharge 5.5 bar, vib 1.7 mm/s, DE bearing 48 C; P-07B flow 409 m3/h, vib 2.7 mm/s, DE bearing 45 C.
+  Sump level cycling normally, float switches verified.
+  Generator weekly no-load test run 15 min, OK.
+  Inlet screen differential nominal, no cleaning required.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-10-12 14:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 453 m3/h, discharge 5.4 bar, vib 1.8 mm/s, DE bearing 49 C; P-07B flow 430 m3/h, vib 2.6 mm/s, DE bearing 48 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Panel room temperature within range, HVAC running.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-10-12 22:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 447 m3/h, discharge 5.3 bar, vib 1.9 mm/s, DE bearing 49 C; P-07B flow 443 m3/h, vib 2.3 mm/s, DE bearing 51 C.
+  Generator weekly no-load test run 15 min, OK.
+  Panel room temperature within range, HVAC running.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Sump level cycling normally, float switches verified.
+
+[2026-10-13 06:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 415 m3/h, discharge 5.5 bar, vib 2.3 mm/s, DE bearing 48 C; P-07B flow 412 m3/h, vib 1.9 mm/s, DE bearing 50 C.
+  Panel room temperature within range, HVAC running.
+  Panel room temperature within range, HVAC running.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Inlet screen differential nominal, no cleaning required.
+[2026-10-13 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 451 m3/h, discharge 5.4 bar, vib 2.5 mm/s, DE bearing 44 C; P-07B flow 427 m3/h, vib 2.5 mm/s, DE bearing 51 C.
+  Inlet screen differential nominal, no cleaning required.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-10-13 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 451 m3/h, discharge 5.4 bar, vib 2.1 mm/s, DE bearing 49 C; P-07B flow 439 m3/h, vib 2.3 mm/s, DE bearing 54 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Generator weekly no-load test run 15 min, OK.
+  Panel room temperature within range, HVAC running.
+  Inlet screen differential nominal, no cleaning required.
+
+[2026-10-14 06:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 421 m3/h, discharge 5.3 bar, vib 2.6 mm/s, DE bearing 47 C; P-07B flow 409 m3/h, vib 2.8 mm/s, DE bearing 46 C.
+  Chlorine residual sample taken and logged at outlet.
+  Inlet screen differential nominal, no cleaning required.
+  Panel room temperature within range, HVAC running.
+  Chlorine residual sample taken and logged at outlet.
+[2026-10-14 14:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 450 m3/h, discharge 5.4 bar, vib 2.3 mm/s, DE bearing 46 C; P-07B flow 420 m3/h, vib 2.1 mm/s, DE bearing 55 C.
+  Panel room temperature within range, HVAC running.
+  Sump level cycling normally, float switches verified.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Inlet screen differential nominal, no cleaning required.
+[2026-10-14 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 447 m3/h, discharge 5.6 bar, vib 1.8 mm/s, DE bearing 50 C; P-07B flow 429 m3/h, vib 2.0 mm/s, DE bearing 57 C.
+  Chlorine residual sample taken and logged at outlet.
+  Panel room temperature within range, HVAC running.
+  Inlet screen differential nominal, no cleaning required.
+  Panel room temperature within range, HVAC running.
+
+[2026-10-15 06:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 452 m3/h, discharge 5.6 bar, vib 2.3 mm/s, DE bearing 49 C; P-07B flow 408 m3/h, vib 2.1 mm/s, DE bearing 46 C.
+  Chlorine residual sample taken and logged at outlet.
+  Panel room temperature within range, HVAC running.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-10-15 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 414 m3/h, discharge 5.5 bar, vib 2.4 mm/s, DE bearing 52 C; P-07B flow 413 m3/h, vib 2.6 mm/s, DE bearing 50 C.
+  Inlet screen differential nominal, no cleaning required.
+  Generator weekly no-load test run 15 min, OK.
+  Sump level cycling normally, float switches verified.
+  Chlorine residual sample taken and logged at outlet.
+[2026-10-15 22:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 412 m3/h, discharge 5.6 bar, vib 2.5 mm/s, DE bearing 49 C; P-07B flow 417 m3/h, vib 2.4 mm/s, DE bearing 48 C.
+  Inlet screen differential nominal, no cleaning required.
+  Sump level cycling normally, float switches verified.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+
+[2026-10-16 06:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 412 m3/h, discharge 5.5 bar, vib 2.3 mm/s, DE bearing 45 C; P-07B flow 442 m3/h, vib 2.6 mm/s, DE bearing 52 C.
+  Inlet screen differential nominal, no cleaning required.
+  Sump level cycling normally, float switches verified.
+  Inlet screen differential nominal, no cleaning required.
+  Generator weekly no-load test run 15 min, OK.
+[2026-10-16 14:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 421 m3/h, discharge 5.2 bar, vib 2.1 mm/s, DE bearing 47 C; P-07B flow 433 m3/h, vib 1.9 mm/s, DE bearing 46 C.
+  Generator weekly no-load test run 15 min, OK.
+  Generator weekly no-load test run 15 min, OK.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-10-16 22:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 432 m3/h, discharge 5.6 bar, vib 2.6 mm/s, DE bearing 51 C; P-07B flow 433 m3/h, vib 2.5 mm/s, DE bearing 53 C.
+  Chlorine residual sample taken and logged at outlet.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Generator weekly no-load test run 15 min, OK.
+  Panel room temperature within range, HVAC running.
+
+[2026-10-17 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 443 m3/h, discharge 5.6 bar, vib 1.8 mm/s, DE bearing 44 C; P-07B flow 431 m3/h, vib 5.0 mm/s, DE bearing 52 C.
+  Inlet screen differential nominal, no cleaning required.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Sump level cycling normally, float switches verified.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-10-17 14:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 433 m3/h, discharge 5.1 bar, vib 1.8 mm/s, DE bearing 51 C; P-07B flow 424 m3/h, vib 6.3 mm/s, DE bearing 51 C.
+  Chlorine residual sample taken and logged at outlet.
+  Generator weekly no-load test run 15 min, OK.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-10-17 22:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 415 m3/h, discharge 5.2 bar, vib 2.2 mm/s, DE bearing 47 C; P-07B flow 447 m3/h, vib 4.8 mm/s, DE bearing 45 C.
+  Panel room temperature within range, HVAC running.
+  Generator weekly no-load test run 15 min, OK.
+  Generator weekly no-load test run 15 min, OK.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+
+[2026-10-18 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 415 m3/h, discharge 5.4 bar, vib 2.1 mm/s, DE bearing 47 C; P-07B flow 410 m3/h, vib 6.0 mm/s, DE bearing 47 C.
+  Inlet screen differential nominal, no cleaning required.
+  Panel room temperature within range, HVAC running.
+  Inlet screen differential nominal, no cleaning required.
+  Generator weekly no-load test run 15 min, OK.
+[2026-10-18 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 452 m3/h, discharge 5.3 bar, vib 1.7 mm/s, DE bearing 47 C; P-07B flow 431 m3/h, vib 6.4 mm/s, DE bearing 55 C.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Chlorine residual sample taken and logged at outlet.
+[2026-10-18 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 412 m3/h, discharge 5.2 bar, vib 2.5 mm/s, DE bearing 52 C; P-07B flow 420 m3/h, vib 5.4 mm/s, DE bearing 46 C.
+  Sump level cycling normally, float switches verified.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Inlet screen differential nominal, no cleaning required.
+  Sump level cycling normally, float switches verified.
+
+[2026-10-19 06:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 426 m3/h, discharge 5.2 bar, vib 2.6 mm/s, DE bearing 46 C; P-07B flow 427 m3/h, vib 5.6 mm/s, DE bearing 48 C.
+  Inlet screen differential nominal, no cleaning required.
+  Chlorine residual sample taken and logged at outlet.
+  Generator weekly no-load test run 15 min, OK.
+  Valve V-07-3 stroked open/close for exercise, OK.
+[2026-10-19 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 445 m3/h, discharge 5.1 bar, vib 1.8 mm/s, DE bearing 46 C; P-07B flow 413 m3/h, vib 6.8 mm/s, DE bearing 54 C.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Panel room temperature within range, HVAC running.
+  Chlorine residual sample taken and logged at outlet.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+[2026-10-19 22:00] Shift handover, operator L. Meyer.
+  Readings: P-07A flow 454 m3/h, discharge 5.2 bar, vib 2.2 mm/s, DE bearing 49 C; P-07B flow 444 m3/h, vib 6.8 mm/s, DE bearing 51 C.
+  Chlorine residual sample taken and logged at outlet.
+  Inlet screen differential nominal, no cleaning required.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+
+[2026-10-20 06:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 446 m3/h, discharge 5.5 bar, vib 2.0 mm/s, DE bearing 48 C; P-07B standby.
+  Inlet screen differential nominal, no cleaning required.
+  Chlorine residual sample taken and logged at outlet.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Generator weekly no-load test run 15 min, OK.
+[2026-10-20 14:00] Shift handover, operator T. Nakamura.
+  Readings: P-07A flow 415 m3/h, discharge 5.3 bar, vib 2.5 mm/s, DE bearing 44 C; P-07B standby.
+  Generator weekly no-load test run 15 min, OK.
+  Panel room temperature within range, HVAC running.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Chlorine residual sample taken and logged at outlet.
+[2026-10-20 22:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 453 m3/h, discharge 5.3 bar, vib 2.1 mm/s, DE bearing 52 C; P-07B standby.
+  Panel room temperature within range, HVAC running.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Panel room temperature within range, HVAC running.
+[2026-10-20 06:40] P-07B drive-end vibration 7.9 mm/s RMS (alarm 7.1, trip 11.0). Bearing temp 71 C (limit 85 C).
+[2026-10-20 07:05] Duty switched to P-07A. P-07B in standby, LOTO tag #4471 applied.
+
+[2026-10-21 06:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 435 m3/h, discharge 5.3 bar, vib 2.0 mm/s, DE bearing 52 C; P-07B standby.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Chlorine residual sample taken and logged at outlet.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Generator weekly no-load test run 15 min, OK.
+[2026-10-21 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 449 m3/h, discharge 5.3 bar, vib 1.7 mm/s, DE bearing 45 C; P-07B standby.
+  Panel room temperature within range, HVAC running.
+  Panel room temperature within range, HVAC running.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Inlet screen differential nominal, no cleaning required.
+[2026-10-21 22:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 429 m3/h, discharge 5.1 bar, vib 2.2 mm/s, DE bearing 45 C; P-07B standby.
+  Sump level cycling normally, float switches verified.
+  Chlorine residual sample taken and logged at outlet.
+  Generator weekly no-load test run 15 min, OK.
+  Generator weekly no-load test run 15 min, OK.
+[2026-10-21 09:30] Inspection: coupling misalignment 0.32 mm (tolerance 0.05 mm). Grease discoloured.
+
+[2026-10-22 06:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 433 m3/h, discharge 5.1 bar, vib 2.2 mm/s, DE bearing 50 C; P-07B standby.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Chlorine residual sample taken and logged at outlet.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-10-22 14:00] Shift handover, operator J. Alvarez.
+  Readings: P-07A flow 421 m3/h, discharge 5.6 bar, vib 1.7 mm/s, DE bearing 50 C; P-07B standby.
+  Panel room temperature within range, HVAC running.
+  Generator weekly no-load test run 15 min, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Panel room temperature within range, HVAC running.
+[2026-10-22 22:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 437 m3/h, discharge 5.6 bar, vib 2.3 mm/s, DE bearing 52 C; P-07B standby.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Inlet screen differential nominal, no cleaning required.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Chlorine residual sample taken and logged at outlet.
+[2026-10-22 13:15] Laser alignment completed: 0.03 mm offset, 0.02 mm/100 mm angular.
+[2026-10-22 14:00] Bearings regreased, 18 g per bearing.
+
+[2026-10-23 06:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 418 m3/h, discharge 5.1 bar, vib 1.6 mm/s, DE bearing 46 C; P-07B standby.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+  Valve V-07-3 stroked open/close for exercise, OK.
+  Walkdown complete, no leaks observed at P-07A/P-07B seals.
+[2026-10-23 14:00] Shift handover, operator S. Iyer.
+  Readings: P-07A flow 451 m3/h, discharge 5.3 bar, vib 1.8 mm/s, DE bearing 52 C; P-07B standby.
+  Inlet screen differential nominal, no cleaning required.
+  Panel room temperature within range, HVAC running.
+  Chlorine residual sample taken and logged at outlet.
+  Valve V-07-3 stroked open/close for exercise, OK.
+[2026-10-23 22:00] Shift handover, operator R. Okafor.
+  Readings: P-07A flow 423 m3/h, discharge 5.2 bar, vib 2.3 mm/s, DE bearing 49 C; P-07B standby.
+  Inlet screen differential nominal, no cleaning required.
+  Chlorine residual sample taken and logged at outlet.
+  HMI-07 alarm summary acknowledged, no standing alarms.
+  Valve V-07-3 stroked open/close for exercise, OK.
+[2026-10-23 08:00] Test run 30 min at 80% speed: vibration 2.4 mm/s RMS, bearing temp 52 C.
+
+WORK ORDER WO-2026-1027 (to be applied on HMI-07):
+ 1. Confirm LOTO tag #4471 removed by authorised technician.
+ 2. Set VFD D-07B ramp-up time to 12 s (was 6 s).
+ 3. Set vibration alarm setpoint to 7.1 mm/s, trip setpoint to 11.0 mm/s.
+ 4. Set discharge pressure high limit to 6.2 bar.
+ 5. Return P-07B to duty/standby rotation, lead pump P-07A.
+ 6. Log first 24 h vibration trend and upload at next maintenance window.
+
+Signed: Shift Engineer, North Basin WTP

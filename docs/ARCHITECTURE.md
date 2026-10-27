@@ -41,6 +41,21 @@
 | Geometry | Classical finder patterns + OpenCV.js `findHomography` / `warpPerspective` on every frame | Deterministic and fast enough for every frame. |
 | SAM 3.1 | Meta Model API, **connected side only**: a text prompt ("computer monitor") acquires and tracks the far screen for the return channel (Mode 3), plus a glare mask. **Not run on every frame** | API-only, so it can't run on the air-gapped side. It provides the ROI at ~1–2 Hz, and the cheap tracker does the per-frame work. |
 
+## Model integration (`packages/lumina-agents`)
+
+Zero-dep TypeScript, runs in Node and the browser. Everything is built around one `ChatModel` interface, so tests use a scripted fake.
+
+| Piece | File | What it does |
+|---|---|---|
+| Bundle schema | `schema.ts` | `lumina.work-order/v1`: asset, steps, setpoints with a fixed parameter vocabulary, and `kind: "neural-summary"`. The JSON Schema is Meta-strict-compatible and is re-validated locally. |
+| Site policy | `policy.ts`, `fixtures/site-policy.json` | Asset allow-list, per-parameter unit and range limits, and an injection-phrase scan. These checks are deterministic and **final**. |
+| Spark packer | `packer.ts` | Calls `POST api.meta.ai/v1/chat/completions` with `response_format.json_schema` (strict) and retries with the validation errors (up to 3). Provenance (source title, bytes and SHA-256) is set by software, never by the model. |
+| Glimmer verifier | `verifier.ts` | Ollama `/api/chat` agent loop with tools `check_asset`, `check_setpoint` and `scan_text`. The bundle is treated as untrusted data. **The model can add reasons to reject but can never approve what policy blocks** (`modelOverruled`). It fails closed: no model → `hold`. |
+| SAM 3.1 | `models/meta.ts` | Request builder for the `POST /v1/responses` stream (text prompt + image). The output parser comes on Day 7. |
+| Trace | `models/types.ts` | Each call records model, op, ms, bytes in and out, and ok. This feeds the UI's model-trace panel. |
+
+CLI: `cd packages/lumina-agents && npm run cli -- status | pack <doc> | verify <bundle>` (config in the root `.env`, see `.env.example`).
+
 ## Realistic throughput budget
 
 These numbers are for the pitch and for the demo-day expectations.

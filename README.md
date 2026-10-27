@@ -26,6 +26,7 @@ The hackathon's rules require new work only. Everything in this repo was written
 
 ```
 packages/lumina-protocol   LT fountain encoder/decoder + optical frame format (zero deps, tested)
+packages/lumina-agents     Meta models: Muse Spark packer, Muse Glimmer verifier, SAM 3.1 client
 apps/web                   React PWA: transmitter (Day 2), receiver (Day 3)
 docs/                      Architecture, 10-day plan, decisions
 ```

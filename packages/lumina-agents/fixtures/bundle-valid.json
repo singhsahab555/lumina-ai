@@ -1,0 +1,18 @@
+{
+  "schema": "lumina.work-order/v1",
+  "kind": "neural-summary",
+  "work_order_id": "WO-2026-1027",
+  "site": "North Basin WTP",
+  "asset_id": "P-07B",
+  "summary": "P-07B drive-end bearing vibration reached 7.9 mm/s after coupling misalignment. Alignment and regreasing are done and a test run passed at 2.4 mm/s. Return the pump to service with the revised drive and alarm settings.",
+  "steps": [
+    { "order": 1, "instruction": "Confirm LOTO tag #4471 has been removed by an authorised technician.", "setpoint": null },
+    { "order": 2, "instruction": "Set VFD D-07B ramp-up time.", "setpoint": { "parameter": "vfd_ramp_time", "value": 12, "unit": "s" } },
+    { "order": 3, "instruction": "Set vibration alarm setpoint.", "setpoint": { "parameter": "vibration_alarm", "value": 7.1, "unit": "mm/s" } },
+    { "order": 4, "instruction": "Set vibration trip setpoint.", "setpoint": { "parameter": "vibration_trip", "value": 11.0, "unit": "mm/s" } },
+    { "order": 5, "instruction": "Set discharge pressure high limit.", "setpoint": { "parameter": "discharge_pressure_high_limit", "value": 6.2, "unit": "bar" } },
+    { "order": 6, "instruction": "Return P-07B to duty/standby rotation with P-07A as lead pump.", "setpoint": null },
+    { "order": 7, "instruction": "Log the first 24 h vibration trend for upload at the next maintenance window.", "setpoint": null }
+  ],
+  "source": { "title": "pump-station-log.txt", "bytes": 1553, "sha256": "ba5d7af80fc8f56f8b6672616090c60b335c087f26dc9099ba5c6cdf1825095f" }
+}

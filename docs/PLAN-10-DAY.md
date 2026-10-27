@@ -28,6 +28,8 @@ Rule: **a working end-to-end demo exists from Day 3 onward.** Every later day ad
 | Camera autofocus/exposure fights the flashing screen | Lock exposure via `applyConstraints` where it's supported, use a calibration border, and keep 2-color as the fallback |
 | Rolling shutter tears frames | Hold symbols ≥2 refreshes, and let CRC drop torn frames |
 | SAM 2 too slow | It is used only for acquisition. Classical tracking does the per-frame work. |
+| **Dev laptop has 8 GB RAM / Intel HD 520: Muse Glimmer 30B cannot run on it** (found Oct 27) | Need a second machine with ≥32 GB RAM or a ≥24 GB GPU as the air-gapped receiver by Day 6. Until then the deterministic policy gate works without the model (verdict fails closed to HOLD). Do not move Glimmer to the cloud: that breaks honesty rule 3. |
+| Meta API billing hold failed (Oct 27) | Keep ~₹2,000 on the card for the ~$20 hold and enable international transactions. Fallback for Spark: Baseten Muse Spark Open. Needed by Day 5. |
 | Day 3 milestone slips | Everything after it slides. AI features must not start before light transfer works. |
 
 ## Hackathon logistics (from the participant guide)

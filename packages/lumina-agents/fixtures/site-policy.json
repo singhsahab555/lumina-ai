@@ -1,0 +1,11 @@
+{
+  "policy_id": "SP-OT-12",
+  "site": "North Basin WTP",
+  "allowed_assets": ["P-07A", "P-07B", "D-07B"],
+  "parameters": {
+    "vfd_ramp_time": { "unit": "s", "min": 5, "max": 20 },
+    "vibration_alarm": { "unit": "mm/s", "min": 4.5, "max": 7.1 },
+    "vibration_trip": { "unit": "mm/s", "min": 7.1, "max": 11.2 },
+    "discharge_pressure_high_limit": { "unit": "bar", "max": 6.5 }
+  }
+}
