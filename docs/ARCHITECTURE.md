@@ -68,4 +68,6 @@ Report *measured* KB/s in the UI. "Effective semantic throughput" can be shown a
 
 See [packages/lumina-protocol/src/packet.ts](../packages/lumina-protocol/src/packet.ts). It uses a 16-byte header (magic, version, session id, total length, block size, seed), the droplet data, and a CRC-32.
 
+Each packet fills one 2-color symbol: see [grid.ts](../packages/lumina-protocol/src/grid.ts). The grid is 64×64 modules with four 7×7 finders (bottom-right one has a hollow core, for orientation) and 3,840 data modules = 480 B, so the max block size is 460 B. Data bits are XORed with a fixed PRNG mask so padding never renders as solid blocks. Raw-mode payloads are deflate-raw; the receiver inflates after LT decode.
+
 Planned v2 header fields: payload type (raw / neural-json / handshake), compression flag, encryption flag, and a SHA-256 manifest carried in a dedicated frame.

@@ -1,0 +1,28 @@
+PUMP STATION PS-07 — MAINTENANCE LOG / WORK ORDER WO-2026-1027
+Site: North Basin Water Treatment, Building C, Lower Gallery
+Asset: Centrifugal pump P-07B (75 kW, 1480 rpm), VFD drive D-07B
+Control network: isolated OT segment (air-gapped), HMI-07 operator station
+
+[2026-10-20 06:12] Operator reported elevated vibration on P-07B drive-end bearing.
+[2026-10-20 06:40] Vibration 7.9 mm/s RMS (alarm 7.1, trip 11.0). Bearing temp 71 C (limit 85 C).
+[2026-10-20 07:05] Switched duty to P-07A. P-07B placed in standby, LOTO tag #4471 applied.
+[2026-10-21 09:30] Inspection: coupling misalignment 0.32 mm (tolerance 0.05 mm). Grease discoloured.
+[2026-10-22 13:15] Laser alignment completed: 0.03 mm offset, 0.02 mm/100 mm angular.
+[2026-10-22 14:00] Bearings regreased, Shell Gadus S2 V220 2, 18 g per bearing.
+[2026-10-23 08:00] Test run 30 min at 80% speed: vibration 2.4 mm/s RMS, bearing temp 52 C.
+
+WORK ORDER STEPS (to be applied on HMI-07):
+ 1. Confirm LOTO tag #4471 removed by authorised technician.
+ 2. Set VFD D-07B ramp-up time to 12 s (was 6 s).
+ 3. Set vibration alarm setpoint to 7.1 mm/s, trip setpoint to 11.0 mm/s.
+ 4. Set discharge pressure high limit to 6.2 bar.
+ 5. Return P-07B to duty/standby rotation, lead pump P-07A.
+ 6. Log first 24 h vibration trend and upload at next maintenance window.
+
+PARAMETER LIMITS (site policy SP-OT-12):
+ - VFD ramp time: 5 s .. 20 s
+ - Vibration alarm: 4.5 .. 7.1 mm/s RMS
+ - Vibration trip: 7.1 .. 11.2 mm/s RMS
+ - Discharge pressure high limit: <= 6.5 bar
+
+Signed: Shift Engineer, North Basin WTP

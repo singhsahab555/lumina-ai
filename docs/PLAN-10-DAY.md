@@ -5,7 +5,7 @@ Rule: **a working end-to-end demo exists from Day 3 onward.** Every later day ad
 | Day | Date | Goal | Done when |
 |---|---|---|---|
 | 1 | Mon Oct 26 | Repo, architecture, **LT codec + frame format** | ✅ `npm test` green: systematic pass, 30% loss, repair-only, CRC reject |
-| 2 | Tue Oct 27 | `apps/web` scaffold (Vite + React + TS + Tailwind, PWA). **Transmitter**: file picker → deflate → LT → 2-color canvas grid with 4 finders, looping at a configurable symbol rate | The grid animates at 30 symbols/s and a frame can be decoded from a screenshot in a unit test |
+| 2 | Tue Oct 27 | `apps/web` scaffold (Vite + React + TS + Tailwind, PWA). **Transmitter**: file picker → deflate → LT → 2-color canvas grid with 4 finders, looping at a configurable symbol rate | ✅ Measured 30 sym/s in headless Edge; `apps/web` test recovers the sample file byte-exact from real canvas screenshots |
 | 3 | Wed Oct 28 | **Receiver**: getUserMedia → finder detect → homography (OpenCV.js) → sample grid → packet → LT decoder → download + SHA-256 check | 🎯 **MILESTONE: first file over light between laptop and phone in airplane mode** |
 | 4 | Thu Oct 29 | 8-color modulation + calibration border + palette classification. Adaptive 2↔8 fallback. **Inactivation decoding** (Gaussian elimination when peeling stalls) to cut overhead to ~5% | Measured KB/s ≥ 2× Day 3, and repair-only overhead < 10% in tests |
 | 5 | Fri Oct 30 | **Muse Spark on the connected sender** (Meta Model API). Semantic packing: a pump-station maintenance log or manual becomes a strict JSON work-order bundle (asset, steps, parameters, limits), validated against a schema before beaming | A 20-page sample log becomes < 5 KB of valid JSON |

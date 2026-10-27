@@ -26,7 +26,7 @@ The hackathon's rules require new work only. Everything in this repo was written
 
 ```
 packages/lumina-protocol   LT fountain encoder/decoder + optical frame format (zero deps, tested)
-apps/web                   React PWA: transmitter + receiver  (Day 2+)
+apps/web                   React PWA: transmitter (Day 2), receiver (Day 3)
 docs/                      Architecture, 10-day plan, decisions
 ```
 
@@ -34,14 +34,21 @@ docs/                      Architecture, 10-day plan, decisions
 
 ```bash
 # Node >= 22.18 (runs TypeScript natively, no build step)
-cd packages/lumina-protocol
-npm test
+npm install
+npm test                       # protocol + web tests
+
+cd apps/web
+npm run dev                    # transmitter at http://localhost:5173
+npm run build && npm run capture   # headless Edge: re-capture screenshots + test fixtures
 ```
+
+![Transmitter beaming a work order at 30 symbols/s](docs/media/day2-transmitter-running.png)
 
 ## Docs
 
 - [Architecture](docs/ARCHITECTURE.md)
 - [10-day build plan](docs/PLAN-10-DAY.md)
+- [Build log with measured numbers](docs/LOG.md)
 
 ## Meta models used
 
