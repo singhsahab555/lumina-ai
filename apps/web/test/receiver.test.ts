@@ -5,8 +5,9 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { deflateRawSync } from 'node:zlib';
 import { LTEncoder, MAX_BLOCK_SIZE, encodePacket, packetToModules, sealEnvelope, type GrayImage } from '@lumina/protocol';
-import { placeGrid, simulateCamera } from '@lumina/protocol/synth';
+import { placeGrid, simulateCamera, simulateCameraRgb } from '@lumina/protocol/synth';
 import { ReceiverSession, unpack } from '../src/lib/receiver.ts';
+import { Transmitter } from '../src/lib/transmitter.ts';
 
 const toRgba = (g: GrayImage) => {
   const data = new Uint8ClampedArray(g.width * g.height * 4);
@@ -55,4 +56,37 @@ test('unpack flags a corrupted payload instead of returning it as verified', asy
   env[env.length - 1] ^= 1;
   const got = await unpack(deflateRawSync(env));
   assert.equal(got.verified, false);
+});
+
+test('an Auto-mode transmitter (8-color + 2-color fallback symbols) decodes through the colour camera path', async () => {
+  let text = '';
+  for (let i = 0; text.length < 12_000; i++) text += `${i},${((i * 2654435761) >>> 0).toString(36)},${(i % 13) * 0.37}
+`;
+  const file = new TextEncoder().encode(text);
+  const tx = new Transmitter(deflateRawSync(sealEnvelope('trend.csv', file)), 9, 'auto');
+  const rx = new ReceiverSession();
+  let payload: Uint8Array | null = null;
+  let symbols = 0;
+  while (!payload && symbols < tx.k * 2) {
+    const s = tx.next();
+    symbols++;
+    const img = simulateCameraRgb(s.modules, s.colors, {
+      width: 960,
+      height: 540,
+      corners: placeGrid(480, 270, 470, symbols * 3, 0.05),
+      blur: 1,
+      noise: 6,
+      crosstalk: 0.08,
+      tint: [1, 0.95, 0.85],
+      seed: symbols,
+    });
+    payload = rx.push(img).payload;
+  }
+  assert.ok(payload, `not done: ${JSON.stringify(rx.stats())}`);
+  const stats = rx.stats();
+  assert.ok(stats.packets / stats.valid > 2, `droplets per frame ${stats.packets / stats.valid}`);
+  assert.ok(symbols <= Math.ceil(tx.k / 2) + 2, `${symbols} symbols for K=${tx.k}`);
+  const got = await unpack(payload);
+  assert.equal(got.verified, true);
+  assert.deepEqual(got.bytes, file);
 });

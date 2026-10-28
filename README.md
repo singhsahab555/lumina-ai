@@ -41,7 +41,7 @@ npm test                       # protocol + web tests
 cd apps/web
 npm run dev                    # http://localhost:5173  (Transmit tab; Receive tab = #rx)
 npm run build && npm run capture   # headless Edge: re-capture screenshots + test fixtures
-npm run build && npm run e2e       # headless Edge with a fake webcam: receiver decodes a 56 KB file
+npm run build && npm run e2e       # headless Edge, fake webcam: 30 KB file in 2-color, 8-color, Auto; prints KB/s
 npm run lan                        # HTTPS on your Wi-Fi (port 4443) so a phone can use its camera
 ```
 
@@ -54,13 +54,15 @@ Live app (HTTPS, installable, works offline): **https://singhsahab555.github.io/
 3. On the laptop open the same link, **Transmit** tab, load a file. On the phone tap **Start camera** and point it at the grid so it fills at least a third of the view.
 4. The phone shows **SHA-256 verified, byte-exact** and a Download button.
 
+Colors: **Auto** (default) sends 8-color symbols (3 droplets each) with every 4th symbol in 2-color as a fallback. If the phone reads only 1.00 droplets/frame, switch the transmitter to **2**. In the fake-camera e2e, 8-color reaches 14.6 KB/s vs 4.6 KB/s for 2-color.
+
 Local alternative: `npm run lan` in `apps/web` serves self-signed HTTPS on port 4443 (phones may restrict the camera on it).
 
 The reverse direction also works without certificates: phone transmits (plain `http://` LAN URL is fine), laptop webcam receives on `localhost`.
 
 ![Receiver locked on a tilted grid](docs/media/day3-receiver-scanning.png)
 
-![Transmitter beaming a work order at 30 symbols/s](docs/media/day2-transmitter-running.png)
+![Transmitter beaming an 8-color grid](docs/media/day4-transmitter-8color.png)
 
 ## Docs
 

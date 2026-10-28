@@ -209,11 +209,13 @@ export function ReceiveView() {
             </div>
             <div className="grid grid-cols-2 gap-2">
               <Stat label="Session" value={stats.sessionId === null ? '-' : stats.sessionId.toString(16).padStart(8, '0')} />
-              <Stat label="Decode" value={`${perf.fps} fps · ${perf.ms} ms`} />
-              <Stat label="Frames read" value={`${stats.frames}`} />
-              <Stat label="Grid found" value={`${stats.located}`} />
+              <Stat label="Decode" value={`${perf.fps} fps · ${perf.ms} ms`} testId="rx-decode" />
+              <Stat label="Frames read" value={`${stats.frames}`} testId="rx-frames" />
+              <Stat label="Grid found" value={`${stats.located}`} testId="rx-located" />
               <Stat label="CRC valid" value={`${stats.valid}`} testId="rx-valid" />
-              <Stat label="Unique droplets" value={`${stats.received}`} />
+              <Stat label="Unique droplets" value={`${stats.received}`} testId="rx-unique" />
+              <Stat label="Colors seen" value={`${stats.colors}`} testId="rx-colors" />
+              <Stat label="Droplets / frame" value={stats.valid ? (stats.packets / stats.valid).toFixed(2) : '-'} testId="rx-dpf" />
             </div>
           </>
         )}
@@ -232,7 +234,7 @@ export function ReceiveView() {
             <div className="grid grid-cols-2 gap-2">
               <Stat label="File" value={file.name} testId="rx-name" />
               <Stat label="Size" value={formatBytes(file.bytes.length)} />
-              <Stat label="Over light" value={`${elapsed.toFixed(1)} s`} />
+              <Stat label="Over light" value={`${elapsed.toFixed(1)} s`} testId="rx-elapsed" />
               <Stat label="Throughput" value={elapsed ? `${formatBytes(Math.round(file.bytes.length / elapsed))}/s` : '-'} />
               <div className="col-span-2">
                 <Stat label="SHA-256" value={file.sha256} testId="rx-sha" />

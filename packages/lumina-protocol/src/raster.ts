@@ -3,7 +3,8 @@
 // screenshot back into modules. Camera frames (perspective, blur) go through
 // readFrame in vision.ts; this is the lossless baseline.
 
-import { GRID_SIZE, type Modules } from './grid.ts';
+import { GRID_SIZE, type Colors, type Modules } from './grid.ts';
+import { moduleRgb } from './palette.ts';
 
 /** Structurally compatible with the DOM ImageData. */
 export interface RgbaImage {
@@ -12,23 +13,22 @@ export interface RgbaImage {
   data: Uint8ClampedArray | Uint8Array;
 }
 
-export const DARK_RGB = [0, 0, 0] as const;
-export const LIGHT_RGB = [255, 255, 255] as const;
-
-export function rasterize(modules: Modules, modulePx = 1, quietModules = 4): RgbaImage {
+export function rasterize(modules: Modules, modulePx = 1, quietModules = 4, colors: Colors = 2): RgbaImage {
   const side = (GRID_SIZE + quietModules * 2) * modulePx;
   const data = new Uint8ClampedArray(side * side * 4).fill(255);
   for (let my = 0; my < GRID_SIZE; my++) {
     for (let mx = 0; mx < GRID_SIZE; mx++) {
-      if (!modules[my * GRID_SIZE + mx]) continue;
+      const v = modules[my * GRID_SIZE + mx];
+      if (!v) continue;
+      const rgb = moduleRgb(v, colors);
       const x0 = (mx + quietModules) * modulePx;
       const y0 = (my + quietModules) * modulePx;
       for (let y = y0; y < y0 + modulePx; y++) {
         for (let x = x0; x < x0 + modulePx; x++) {
           const p = (y * side + x) * 4;
-          data[p] = DARK_RGB[0];
-          data[p + 1] = DARK_RGB[1];
-          data[p + 2] = DARK_RGB[2];
+          data[p] = rgb[0];
+          data[p + 1] = rgb[1];
+          data[p + 2] = rgb[2];
         }
       }
     }

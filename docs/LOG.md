@@ -2,6 +2,32 @@
 
 Measured numbers per day. Newest first.
 
+## Day 4: 8-color, calibration border, inactivation decoding (Wed Oct 28)
+
+- **Wire format v2** (packet `VERSION = 2`). The grid edge rows/columns between finders are now a calibration border (192 modules). Data modules: 3,648 = 456 B per plane, so the max block size is 436 B (was 460).
+- **8-color = 3 bit-planes.** Palette = RGB cube corners. Palette index bit p = plane p = "channel off" (bit 0 G, bit 1 R, bit 2 B). Each plane is a full packet with its own CRC, so one symbol carries 3 droplets, and a bad plane costs only that droplet. The border cycles through the 8 colours (2-color: alternates dark/light). The receiver averages each colour per border side, blends the 4 side palettes per module (inverse-square distance to the side), and classifies to the nearest colour.
+- **Mode is auto-detected per frame**: the border's chroma tells 8-color from 2-color, so the receiver has no setting.
+- **2↔8 fallback**, two layers:
+  - (a) Plane 0 (G) is luma-separable (white/yellow/cyan/green vs magenta/red/blue/black), so a camera that loses hue still reads 1 droplet per frame by luma. A border-learned threshold beats the local mean here (17 → 0 bit errors). **Limit, measured:** it holds to ~6% crosstalk. At 10% crosstalk, green and magenta both sit at ~0.5 luma, so it is no general answer.
+  - (b) So the transmitter's **Auto** mode (default) sends every 4th symbol in 2-color. A colour-blind camera still progresses, and good cameras lose ~17% (2.5 vs 3 droplets per symbol). The transmitter also has forced 2 and 8 modes.
+- **Inactivation decoding.** When peeling stalls and the residual droplets number at least the unknown blocks, the decoder runs a bits-only GF(2) rank check, then Gauss-Jordan with the data.
+  - Repair-only overhead: pure peeling needed ~26% median at K=200. Elimination plus a degree boost brings this to ~2 extra droplets.
+  - Found in the e2e: with sparse repair rows, a droplet sent after a 75%-complete systematic pass often hits only known blocks and is wasted, which cost +21% at K=70. Repair degrees are now `max(soliton + 2, K/4 ± parity)`. Mixed-loss median is +1 to +3 droplets at K = 11–1000.
+  - The parity is random because rows of one fixed even degree are all orthogonal to the all-ones vector, which caps the rank at K−1. A benchmark of mine first looked like a PRNG bug because of this.
+- **Measured, browser e2e** (`npm run e2e`): the same fake camera for every mode (960×540, tilt, blur, noise, 8% crosstalk, warm cast, 4:2:0 chroma, each symbol twice, every 5th frame torn). The file is 30 KB incompressible (K = 69). All runs SHA-256 verified and byte-exact.
+
+  | Mode | Unique droplets | Over light | Throughput |
+  |---|---|---|---|
+  | 2-color | 74 | 6.4 s | **4.6 KB/s** |
+  | 8-color | 69 | 2.0 s | **14.6 KB/s** (**3.2×**) |
+  | Auto | 69 | 2.6 s | 11.3 KB/s |
+
+  Day 3's 2-color decoder would have been slower still (peeling overhead), so ≥2× Day 3 holds with margin. Earlier runs were noisy because the fake video looped: a looping video repeats droplets, which a real screen never does. The video is now 3×K long.
+- `readFrame` on 960×540: ~25 ms per 8-color frame, ~30 ms per 2-color frame (Node).
+- Bug fixed: in 2-color mode, dark data joined through the border formed a grid-sized "marked finder" that took one of the 3 marked slots. Marked candidates now need 3 plain finders of similar size.
+- Tests: protocol 27/27 (new `color.test.ts`: 3 planes under crosstalk/cast/gradient/tilt, auto-detect, luma fallback, 8-color ≤ ½ the symbols of 2-color), web 7/7 (Auto-mode stream through the colour camera; 8-color screenshot fixtures in `test/fixtures/frames8/`), agents 16/16.
+- Still not measured: a real phone camera on 8-color. Next real-device test: does the phone resolve all 3 planes, and at what symbol rate?
+
 ## Day 3: receiver (built Tue Oct 27, a day early)
 
 - Decision: **no OpenCV.js**. Finder detection + homography are ~300 lines of TS in `lumina-protocol/src/vision.ts`. It's 8 MB less to cache in the PWA, works offline, and the same code runs in Node tests.

@@ -39,8 +39,35 @@ test('decodes from repair droplets only (receiver missed the whole systematic pa
   let seed = enc.k;
   while (!dec.done && seed < enc.k * 4) dec.add(enc.droplet(seed++));
   assert.ok(dec.done);
-  const overhead = dec.received / enc.k - 1;
-  assert.ok(overhead < 0.6, `overhead ${(overhead * 100).toFixed(1)}%`);
+  assert.ok(dec.inactivated > 0, 'Gaussian elimination should have finished the decode');
+  assert.deepEqual(dec.result(), data);
+});
+
+test('inactivation decoding keeps repair-only overhead under 10%', () => {
+  // 20 sessions per size; peeling alone needed ~26% median at K=200.
+  for (const k of [50, 100, 200]) {
+    const overheads: number[] = [];
+    for (let s = 0; s < 20; s++) {
+      const enc = new LTEncoder(randomBytes(k * 32, s + 11), 32, 1000 + s);
+      const dec = new LTDecoder(enc.config);
+      let seed = enc.k;
+      while (!dec.done) dec.add(enc.droplet(seed++));
+      overheads.push(dec.received / enc.k - 1);
+    }
+    overheads.sort((a, b) => a - b);
+    const median = overheads[10];
+    const mean = overheads.reduce((a, b) => a + b, 0) / overheads.length;
+    assert.ok(median < 0.1 && mean < 0.1, `K=${k}: median ${(median * 100).toFixed(1)}%, mean ${(mean * 100).toFixed(1)}%`);
+  }
+});
+
+test('mixed systematic + repair with heavy loss still decodes exactly', () => {
+  const data = randomBytes(40_000, 21);
+  const enc = new LTEncoder(data, 200, 77);
+  const dec = new LTDecoder(enc.config);
+  const loss = mulberry32(5);
+  for (let seed = 0; !dec.done && seed < enc.k * 4; seed++) if (loss() >= 0.6) dec.add(enc.droplet(seed));
+  assert.ok(dec.done);
   assert.deepEqual(dec.result(), data);
 });
 

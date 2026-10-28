@@ -1,8 +1,10 @@
-// Camera-frame reader for the 2-color grid, in plain TypeScript (no OpenCV):
+// Camera-frame reader for the grid, in plain TypeScript (no OpenCV):
 //
 //   RGBA → luma → adaptive threshold → connected components → finder rings
 //   → pick 3 plain + 1 marked finder → homography from the finder centres
-//   → sample 64×64 modules → local-mean threshold → packet → CRC.
+//   → 8-color: sample RGB, calibrate from the border, classify → 3 planes
+//   → 2-color (or 8-color plane 0 fallback): local-mean luma threshold
+//   → packets → CRC.
 //
 // A finder is a dark ring whose hole contains a separate dark core: 3×3
 // modules for the plain finders, a 1×1 dot for the marked BR one. The core
@@ -10,7 +12,7 @@
 // because the core is small. The CRC is the final judge: every plausible
 // corner assignment (including a mirrored one) is tried until one passes.
 
-import { GRID_SIZE, modulesToPacket, type Modules } from './grid.ts';
+import { BORDER_MODULES, BORDER_SIDE, COLOR_PLANES, DATA_MODULES, GRID_SIZE, modulesToPacket, type Colors, type Modules } from './grid.ts';
 import { decodePacket, type DecodedPacket } from './packet.ts';
 import { applyHomography, solveHomography, type Homography, type Point } from './homography.ts';
 import type { RgbaImage } from './raster.ts';
@@ -32,7 +34,12 @@ export interface FrameRead {
   /** Grid outline (TL, TR, BR, BL) in image pixels, for overlays. */
   quad: Point[] | null;
   modules: Modules | null;
+  /** First valid packet, for 2-color callers. */
   packet: DecodedPacket | null;
+  /** Every CRC-valid packet in the frame: up to 3 for an 8-color symbol. */
+  packets: DecodedPacket[];
+  /** Mode the calibration border showed (2 unless it was seen in colour). */
+  colors: Colors;
   finders: Finder[];
 }
 
@@ -202,9 +209,12 @@ const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
 
 /** Candidate [TL, TR, BL, BR] finder centre sets, most plausible first. */
 function* cornerSets(finders: Finder[]): Generator<Point[]> {
-  const marked = finders.filter((f) => f.marked).slice(0, 3);
+  const partners = (br: Finder) => finders.filter((f) => !f.marked && f.size > br.size * 0.4 && f.size < br.size * 2.5);
+  // Dark data can join into a grid-sized "ring"; a real BR finder has 3 plain
+  // finders of similar size, so only those candidates take one of the slots.
+  const marked = finders.filter((f) => f.marked && partners(f).length >= 3).slice(0, 3);
   for (const br of marked) {
-    const plain = finders.filter((f) => !f.marked && f.size > br.size * 0.4 && f.size < br.size * 2.5).slice(0, 4);
+    const plain = partners(br).slice(0, 4);
     for (let i = 0; i < plain.length; i++) {
       for (let j = i + 1; j < plain.length; j++) {
         for (let k = j + 1; k < plain.length; k++) {
@@ -247,8 +257,7 @@ const SAMPLE_OFFSETS = [
 ];
 const LOCAL_RADIUS = 4;
 
-/** Samples the module grid through H (module space → image). Null if it leaves the frame. */
-export function sampleModules(g: GrayImage, hm: Homography): Modules | null {
+function sampleLuma(g: GrayImage, hm: Homography): Float32Array | null {
   const n = GRID_SIZE;
   const values = new Float32Array(n * n);
   for (let my = 0; my < n; my++) {
@@ -263,6 +272,66 @@ export function sampleModules(g: GrayImage, hm: Homography): Modules | null {
       values[my * n + mx] = sum / SAMPLE_OFFSETS.length;
     }
   }
+  return values;
+}
+
+/** Samples the module grid through H (module space → image). Null if it leaves the frame. */
+export function sampleModules(g: GrayImage, hm: Homography): Modules | null {
+  const values = sampleLuma(g, hm);
+  return values && localMeanThreshold(values);
+}
+
+// Inverse-squared-distance weights of the 4 border sides (top, right,
+// bottom, left) for module (x, y), normalised to sum to 1.
+function sideWeights(x: number, y: number, out: Float32Array): void {
+  const n = GRID_SIZE;
+  out[0] = 1 / (y + 1) ** 2;
+  out[1] = 1 / (n - x) ** 2;
+  out[2] = 1 / (n - y) ** 2;
+  out[3] = 1 / (x + 1) ** 2;
+  const total = out[0] + out[1] + out[2] + out[3];
+  for (let k = 0; k < 4; k++) out[k] /= total;
+}
+
+/**
+ * Plane-0 threshold learned from the border: odd slots are plane-0 dark in
+ * both modes, so per side the cut sits between the darkest even slot and the
+ * brightest odd one (green vs magenta in 8-color, white vs black in 2-color).
+ * Tighter than the local mean when 8-color luma levels are uneven.
+ */
+function borderThreshold(values: Float32Array): Modules | null {
+  const slots = new Float32Array(32);
+  const counts = new Uint16Array(32);
+  for (let i = 0; i < BORDER_MODULES.length; i++) {
+    const s = Math.floor(i / BORDER_SIDE) * 8 + (i & 7);
+    slots[s] += values[BORDER_MODULES[i]];
+    counts[s]++;
+  }
+  const cut = new Float32Array(4);
+  for (let side = 0; side < 4; side++) {
+    let lightMin = Infinity;
+    let darkMax = -Infinity;
+    for (let slot = 0; slot < 8; slot++) {
+      const v = slots[side * 8 + slot] / counts[side * 8 + slot];
+      if (slot & 1) darkMax = Math.max(darkMax, v);
+      else lightMin = Math.min(lightMin, v);
+    }
+    if (lightMin - darkMax < 8) return null;
+    cut[side] = (lightMin + darkMax) / 2;
+  }
+  const modules = new Uint8Array(GRID_SIZE * GRID_SIZE);
+  const w = new Float32Array(4);
+  for (let d = 0; d < DATA_MODULES.length; d++) {
+    const pos = DATA_MODULES[d];
+    const x = pos % GRID_SIZE;
+    sideWeights(x, (pos - x) / GRID_SIZE, w);
+    modules[pos] = values[pos] < w[0] * cut[0] + w[1] * cut[1] + w[2] * cut[2] + w[3] * cut[3] ? 1 : 0;
+  }
+  return modules;
+}
+
+function localMeanThreshold(values: Float32Array): Modules {
+  const n = GRID_SIZE;
   // Whitened data is ~50% dark, so the local mean is a good per-module
   // threshold that follows glare and vignetting across the screen.
   const pn = n + 1;
@@ -288,11 +357,155 @@ export function sampleModules(g: GrayImage, hm: Homography): Modules | null {
   return modules;
 }
 
+/** Like sampleModules but keeps RGB: 3 floats per module. */
+function sampleRgb(img: RgbaImage, hm: Homography): Float32Array | null {
+  const { width: w, height: h, data } = img;
+  const n = GRID_SIZE;
+  const out = new Float32Array(n * n * 3);
+  for (let my = 0; my < n; my++) {
+    for (let mx = 0; mx < n; mx++) {
+      let r = 0;
+      let gr = 0;
+      let b = 0;
+      for (const [ox, oy] of SAMPLE_OFFSETS) {
+        const p = applyHomography(hm, mx + 0.5 + ox, my + 0.5 + oy);
+        const x = p.x - 0.5;
+        const y = p.y - 0.5;
+        if (x < 0 || y < 0 || x > w - 1 || y > h - 1) return null;
+        const x0 = Math.min(Math.floor(x), w - 2);
+        const y0 = Math.min(Math.floor(y), h - 2);
+        const fx = x - x0;
+        const fy = y - y0;
+        const w00 = (1 - fx) * (1 - fy);
+        const w10 = fx * (1 - fy);
+        const w01 = (1 - fx) * fy;
+        const w11 = fx * fy;
+        const i = (y0 * w + x0) * 4;
+        const j = i + w * 4;
+        r += data[i] * w00 + data[i + 4] * w10 + data[j] * w01 + data[j + 4] * w11;
+        gr += data[i + 1] * w00 + data[i + 5] * w10 + data[j + 1] * w01 + data[j + 5] * w11;
+        b += data[i + 2] * w00 + data[i + 6] * w10 + data[j + 2] * w01 + data[j + 6] * w11;
+      }
+      const o = (my * n + mx) * 3;
+      out[o] = r / SAMPLE_OFFSETS.length;
+      out[o + 1] = gr / SAMPLE_OFFSETS.length;
+      out[o + 2] = b / SAMPLE_OFFSETS.length;
+    }
+  }
+  return out;
+}
+
+// Mean chroma of the 6 coloured slots, relative to the white-black range,
+// above which the border reads as an 8-color palette (2-color borders: ~0).
+const MIN_CHROMA = 0.3;
+
+/**
+ * The palette as this screen renders it and this camera sees it, measured
+ * per border side (4 sides × 8 slots × RGB). Null when the border is grey.
+ */
+function calibrate(rgb: Float32Array): Float32Array | null {
+  const sides = new Float32Array(4 * 24);
+  const counts = new Uint16Array(4 * 8);
+  for (let i = 0; i < BORDER_MODULES.length; i++) {
+    const s = Math.floor(i / BORDER_SIDE) * 8 + (i & 7);
+    const o = BORDER_MODULES[i] * 3;
+    sides[s * 3] += rgb[o];
+    sides[s * 3 + 1] += rgb[o + 1];
+    sides[s * 3 + 2] += rgb[o + 2];
+    counts[s]++;
+  }
+  for (let s = 0; s < 32; s++) for (let c = 0; c < 3; c++) sides[s * 3 + c] /= counts[s];
+
+  const mean = (slot: number, c: number) =>
+    (sides[slot * 3 + c] + sides[(8 + slot) * 3 + c] + sides[(16 + slot) * 3 + c] + sides[(24 + slot) * 3 + c]) / 4;
+  const luma = (slot: number) => 0.299 * mean(slot, 0) + 0.587 * mean(slot, 1) + 0.114 * mean(slot, 2);
+  const range = luma(0) - luma(7);
+  if (range < 24) return null;
+  let chroma = 0;
+  for (let slot = 1; slot < 7; slot++) {
+    const r = mean(slot, 0);
+    const g = mean(slot, 1);
+    const b = mean(slot, 2);
+    chroma += Math.max(r, g, b) - Math.min(r, g, b);
+  }
+  return chroma / 6 > MIN_CHROMA * range ? sides : null;
+}
+
+/**
+ * Nearest-palette classification. Each module is compared with a blend of
+ * the four side palettes, weighted by inverse squared distance to each side,
+ * so it follows brightness gradients and colour casts across the screen.
+ */
+function classify(rgb: Float32Array, sides: Float32Array): Modules {
+  const n = GRID_SIZE;
+  const modules = new Uint8Array(n * n);
+  const pal = new Float32Array(24);
+  const w = new Float32Array(4);
+  for (let d = 0; d < DATA_MODULES.length; d++) {
+    const pos = DATA_MODULES[d];
+    const x = pos % n;
+    sideWeights(x, (pos - x) / n, w);
+    for (let k = 0; k < 24; k++) pal[k] = sides[k] * w[0] + sides[24 + k] * w[1] + sides[48 + k] * w[2] + sides[72 + k] * w[3];
+    const o = pos * 3;
+    let best = 0;
+    let bestD = Infinity;
+    for (let v = 0; v < 8; v++) {
+      const dr = rgb[o] - pal[v * 3];
+      const dg = rgb[o + 1] - pal[v * 3 + 1];
+      const db = rgb[o + 2] - pal[v * 3 + 2];
+      const dist = dr * dr + dg * dg + db * db;
+      if (dist < bestD) {
+        bestD = dist;
+        best = v;
+      }
+    }
+    modules[pos] = best;
+  }
+  return modules;
+}
+
+interface GridRead {
+  modules: Modules | null;
+  packets: DecodedPacket[];
+  colors: Colors;
+}
+
+function decodeGrid(g: GrayImage, rgba: RgbaImage | null, hm: Homography): GridRead {
+  let colorRead: GridRead | null = null;
+  if (rgba) {
+    const rgb = sampleRgb(rgba, hm);
+    const sides = rgb && calibrate(rgb);
+    if (rgb && sides) {
+      const modules = classify(rgb, sides);
+      const planes = Array.from({ length: COLOR_PLANES }, (_, p) => decodePacket(modulesToPacket(modules, p)));
+      colorRead = { modules, packets: planes.filter((p) => p !== null), colors: 8 };
+      if (planes[0]) return colorRead;
+    }
+  }
+  // 2-color frames, and the fallback for plane 0 of an 8-color one: a luma
+  // threshold separates G-on from G-off even when hue is unreliable.
+  const values = sampleLuma(g, hm);
+  let modules = values && localMeanThreshold(values);
+  let p0 = modules ? decodePacket(modulesToPacket(modules)) : null;
+  if (values && !p0) {
+    const byBorder = borderThreshold(values);
+    p0 = byBorder ? decodePacket(modulesToPacket(byBorder)) : null;
+    if (p0) modules = byBorder;
+  }
+  if (colorRead) {
+    if (p0) colorRead.packets.unshift(p0);
+    return colorRead;
+  }
+  return { modules, packets: p0 ? [p0] : [], colors: 2 };
+}
+
 const MAX_ATTEMPTS = 8;
 
 /** Locates, samples and CRC-checks one camera frame. Never throws on bad input. */
 export function readFrame(img: RgbaImage | GrayImage): FrameRead {
-  const g = 'data' in img && img.data.length === img.width * img.height ? (img as GrayImage) : toGray(img as RgbaImage);
+  const isGray = img.data.length === img.width * img.height;
+  const g = isGray ? (img as GrayImage) : toGray(img as RgbaImage);
+  const rgba = isGray ? null : (img as RgbaImage);
   const finders = findFinders(g);
   let first: FrameRead | null = null;
   let attempts = 0;
@@ -306,10 +519,10 @@ export function readFrame(img: RgbaImage | GrayImage): FrameRead {
       [GRID_SIZE, GRID_SIZE],
       [0, GRID_SIZE],
     ].map(([x, y]) => applyHomography(hm, x, y));
-    const modules = sampleModules(g, hm);
-    const packet = modules ? decodePacket(modulesToPacket(modules)) : null;
-    if (packet) return { quad, modules, packet, finders };
-    first ??= { quad, modules, packet: null, finders };
+    const r = decodeGrid(g, rgba, hm);
+    const read: FrameRead = { quad, ...r, packet: r.packets[0] ?? null, finders };
+    if (read.packet) return read;
+    first ??= read;
   }
-  return first ?? { quad: null, modules: null, packet: null, finders };
+  return first ?? { quad: null, modules: null, packet: null, packets: [], colors: 2, finders };
 }

@@ -40,8 +40,9 @@ function embed(src: RgbaImage, width: number, height: number, ox: number, oy: nu
 }
 
 test('frame capacity fits a max-size packet', () => {
-  assert.equal(FRAME_CAPACITY_BYTES, (GRID_SIZE * GRID_SIZE - 4 * 64) / 8);
-  assert.equal(MAX_BLOCK_SIZE, 460);
+  // 4 finder corners (8×8) and the 4 × 48-module calibration border are not data.
+  assert.equal(FRAME_CAPACITY_BYTES, (GRID_SIZE * GRID_SIZE - 4 * 64 - 4 * 48) / 8);
+  assert.equal(MAX_BLOCK_SIZE, 436);
 });
 
 test('packet survives modules round-trip', () => {

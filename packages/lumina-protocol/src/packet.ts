@@ -17,7 +17,7 @@
 import type { Droplet, LTConfig } from './lt.ts';
 
 export const MAGIC = 0x4c;
-export const VERSION = 1;
+export const VERSION = 2;
 export const HEADER_SIZE = 16;
 export const CRC_SIZE = 4;
 

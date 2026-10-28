@@ -3,7 +3,7 @@ import { MAX_BLOCK_SIZE, sealEnvelope, sha256, toHex } from '@lumina/protocol';
 import { GridCanvas, type GridCanvasHandle } from './GridCanvas.tsx';
 import { Stat, formatBytes } from './Stat.tsx';
 import { deflateRaw } from '../lib/deflate.ts';
-import { Transmitter, randomSessionId } from '../lib/transmitter.ts';
+import { Transmitter, dropletsPerSymbol, randomSessionId, type TxMode } from '../lib/transmitter.ts';
 import { startScheduler, type SchedulerStats } from '../lib/scheduler.ts';
 
 const SAMPLE_URL = `${import.meta.env.BASE_URL}samples/pump-station-log.txt`;
@@ -21,11 +21,16 @@ export function TransmitView() {
   const tx = useRef<Transmitter | null>(null);
   const [payload, setPayload] = useState<Payload | null>(null);
   const [rate, setRate] = useState(30);
+  const [mode, setMode] = useState<TxMode>('auto');
+  const [colors, setColors] = useState(8);
   const [paused, setPaused] = useState(false);
   const [seed, setSeed] = useState(0);
   const [stats, setStats] = useState<SchedulerStats>({ symbolsPerSecond: 0, refreshHz: 0 });
   const [error, setError] = useState<string | null>(null);
 
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
+  if (tx.current) tx.current.mode = mode;
   const rateRef = useRef(rate);
   const runningRef = useRef(false);
   const seedRef = useRef(0);
@@ -35,8 +40,9 @@ export function TransmitView() {
   const emit = useCallback(() => {
     if (!tx.current) return;
     const symbol = tx.current.next();
-    grid.current?.draw(symbol.modules);
+    grid.current?.draw(symbol.modules, symbol.colors);
     seedRef.current = symbol.seed;
+    setColors(symbol.colors);
   }, []);
 
   useEffect(
@@ -60,7 +66,7 @@ export function TransmitView() {
         // The envelope carries the name and SHA-256, so the receiver can verify the file itself.
         const compressed = await deflateRaw(sealEnvelope(name, bytes));
         const sessionId = randomSessionId();
-        tx.current = new Transmitter(compressed, sessionId);
+        tx.current = new Transmitter(compressed, sessionId, modeRef.current);
         setPayload({ name, originalBytes: bytes.length, compressedBytes: compressed.length, sessionId, sha256: toHex(sha256(bytes)) });
         emit();
         setSeed(seedRef.current);
@@ -91,7 +97,7 @@ export function TransmitView() {
   return (
     <div className="flex flex-col gap-6 lg:flex-row">
       <aside className="flex w-full flex-col gap-4 lg:w-80 lg:shrink-0">
-        <p className="text-sm text-zinc-400">Transmitter · raw mode · 2-color</p>
+        <p className="text-sm text-zinc-400">Transmitter · raw mode · {colors}-color</p>
 
         <label
           className="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-dashed border-zinc-700 px-4 py-6 text-center hover:border-yellow-400"
@@ -114,6 +120,22 @@ export function TransmitView() {
         </button>
 
         <div className="rounded-xl bg-zinc-900 p-3">
+          <div className="mb-2 flex items-center justify-between text-sm">
+            <span>Colors</span>
+            <div className="flex gap-1 rounded-lg bg-zinc-800 p-0.5">
+              {(['auto', 8, 2] as const).map((m) => (
+                <button
+                  key={m}
+                  className={`rounded-md px-2.5 py-1 text-xs ${mode === m ? 'bg-yellow-400 font-medium text-black' : 'text-zinc-300'}`}
+                  onClick={() => setMode(m)}
+                  data-testid={`mode-${m}`}
+                  title={m === 'auto' ? '8-color, with every 4th symbol in 2-color as a fallback' : `${m}-color only`}
+                >
+                  {m === 'auto' ? 'Auto' : m}
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="mb-1 flex justify-between text-sm">
             <span>Symbol rate</span>
             <span className="font-mono">{rate} /s</span>
@@ -162,8 +184,8 @@ export function TransmitView() {
             <Stat label="Seed" value={`${seed} ${repair ? 'repair' : 'systematic'}`} testId="seed" />
             <Stat label="Measured" value={`${stats.symbolsPerSecond} sym/s`} testId="measured" />
             <Stat label="Display" value={`${stats.refreshHz} Hz`} />
-            <Stat label="Raw rate" value={`${formatBytes(stats.symbolsPerSecond * MAX_BLOCK_SIZE)}/s`} />
-            <Stat label="Frames sent" value={`${seed + 1}`} />
+            <Stat label="Raw rate" value={`${formatBytes(Math.round(stats.symbolsPerSecond * MAX_BLOCK_SIZE * dropletsPerSymbol(mode)))}/s`} />
+            <Stat label="Droplets sent" value={`${seed + 1}`} />
             <div className="col-span-2">
               <Stat label="SHA-256" value={`${payload.sha256.slice(0, 16)}…`} testId="tx-sha" />
             </div>

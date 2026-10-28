@@ -1,11 +1,11 @@
 import { forwardRef, useImperativeHandle, useRef } from 'react';
-import { GRID_SIZE, rasterize, type Modules } from '@lumina/protocol';
+import { GRID_SIZE, rasterize, type Colors, type Modules } from '@lumina/protocol';
 
 export const QUIET_MODULES = 4;
 const SIDE = GRID_SIZE + QUIET_MODULES * 2;
 
 export interface GridCanvasHandle {
-  draw(modules: Modules): void;
+  draw(modules: Modules, colors: Colors): void;
 }
 
 // One canvas pixel per module, scaled up by CSS with nearest-neighbour so
@@ -15,10 +15,10 @@ export const GridCanvas = forwardRef<GridCanvasHandle, { className?: string }>(f
   const canvas = useRef<HTMLCanvasElement>(null);
 
   useImperativeHandle(ref, () => ({
-    draw(modules) {
+    draw(modules, colors) {
       const ctx = canvas.current?.getContext('2d');
       if (!ctx) return;
-      const img = rasterize(modules, 1, QUIET_MODULES);
+      const img = rasterize(modules, 1, QUIET_MODULES, colors);
       ctx.putImageData(new ImageData(img.data as Uint8ClampedArray<ArrayBuffer>, img.width, img.height), 0, 0);
     },
   }));

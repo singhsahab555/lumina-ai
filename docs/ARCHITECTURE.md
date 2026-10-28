@@ -37,7 +37,7 @@
 | Semantic packing | **Muse Spark via the Meta Model API**, on the *connected* sender only. Output must validate against a JSON schema. | The sender is the online side of the bridge, so a cloud call there doesn't break the air gap. **It is lossy** and has to be presented that way (see "Honesty rules"). |
 | Offline verifier agent | **Muse Glimmer 30B via Ollama**, local on the air-gapped receiver | Open weights (Apache 2.0) with no network needed. It checks bundles against local policy, flags injections, and rehydrates them into an actionable view. Needs a laptop with a GPU or ≥32 GB of unified memory. A phone can't run it, so phones receive in raw mode only. |
 | Encryption | WebCrypto AES-256-GCM. The key comes from ECDH (Mode 3 bidirectional) or a passphrase via PBKDF2 | Built into the browser, with no crypto dependencies. |
-| Modulation | 2-color (1 bit/module) baseline, 8-color (3 bit/module) when calibration passes | Adaptive. The receiver falls back to 2-color under glare. |
+| Modulation | 2-color (1 bit/module) and 8-color (3 bit-planes, one packet each). Transmitter Auto mode = 8-color with every 4th symbol in 2-color | The receiver auto-detects the mode per frame from the calibration border. 8-color plane 0 also reads by luma alone. |
 | Geometry | Classical finder patterns + 4-point homography in plain TypeScript ([vision.ts](../packages/lumina-protocol/src/vision.ts)), in a Web Worker | Deterministic, ~30 ms per 720p frame, no 8 MB OpenCV.js download, and unit-testable in Node. |
 | SAM 3.1 | Meta Model API, **connected side only**: a text prompt ("computer monitor") acquires and tracks the far screen for the return channel (Mode 3), plus a glare mask. **Not run on every frame** | API-only, so it can't run on the air-gapped side. It provides the ROI at ~1–2 Hz, and the cheap tracker does the per-frame work. |
 
@@ -60,10 +60,10 @@ CLI: `cd packages/lumina-agents && npm run cli -- status | pack <doc> | verify <
 
 These numbers are for the pitch and for the demo-day expectations.
 
-- Grid 64×64 → ~3,600 data modules after finders and the calibration border.
-- 8-color: 3 bits/module → ~1.3 KB/frame (block size 1024 + 20 B header/CRC).
+- Grid 64×64 → 3,648 data modules after finders and the calibration border.
+- 8-color: 3 bit-planes × 436 B blocks → 1.3 KB of payload per symbol (2-color: 436 B).
 - Phone cameras capture at 30 FPS (60 FPS on some devices) with rolling shutter. The sender **holds each symbol for 2 display refreshes** to avoid torn frames, which gives ~15–30 symbols/s and roughly **15–40 KB/s raw**.
-- A 200 KB file → ~5–13 s. A 20-page log of ~60 KB text that Llama distills to ~3 KB → **< 1 s**. That gap is the demo.
+- A 200 KB file → ~5–13 s. A 20-page log of ~60 KB text that Muse Spark distills to ~3 KB (lossy, labeled as such) → **< 1 s**. That gap is the demo.
 
 Report *measured* KB/s in the UI. "Effective semantic throughput" can be shown as a secondary metric only if it is labeled as such.
 
@@ -83,12 +83,12 @@ Report *measured* KB/s in the UI. "Effective semantic throughput" can be shown a
 
 See [packages/lumina-protocol/src/packet.ts](../packages/lumina-protocol/src/packet.ts). It uses a 16-byte header (magic, version, session id, total length, block size, seed), the droplet data, and a CRC-32.
 
-Each packet fills one 2-color symbol: see [grid.ts](../packages/lumina-protocol/src/grid.ts). The grid is 64×64 modules with four 7×7 finders (bottom-right one has a hollow core, for orientation) and 3,840 data modules = 480 B, so the max block size is 460 B. Data bits are XORed with a fixed PRNG mask so padding never renders as solid blocks. Raw-mode payloads are deflate-raw; the receiver inflates after LT decode.
+Each packet fills one bit-plane of a symbol: see [grid.ts](../packages/lumina-protocol/src/grid.ts) and [palette.ts](../packages/lumina-protocol/src/palette.ts). The grid is 64×64 modules: four 7×7 finders (the bottom-right one has a hollow core, for orientation), a 1-module calibration border between them (192 modules cycling the 8 palette colours; dark/light in 2-color), and 3,648 data modules = 456 B, so the max block size is 436 B. A 2-color symbol is one plane. An 8-color symbol is three: palette index bit p = plane p = colour channel off (G, R, B), so each module is one of the 8 RGB-cube corners. Data bits of each plane are XORed with that plane's PRNG mask, so padding never renders as solid blocks. Raw-mode payloads are deflate-raw; the receiver inflates after LT decode.
 
 The LT payload is a file envelope ([envelope.ts](../packages/lumina-protocol/src/envelope.ts)): magic `LUMF`, version, SHA-256 of the file, name, then the bytes, all deflated. The receiver recomputes SHA-256 and only shows "verified" on a match. SHA-256 is implemented in TS because `crypto.subtle` is missing on non-secure (plain LAN http) pages.
 
 ### Receiver pipeline
 
-Camera frame (downscaled to ≤1280 px) → worker → luma → Bradley adaptive threshold (12% and ≥12 levels below local mean) → 4-connected components → finder = dark ring whose hole holds a separate dark core (core/ring area ≈ 9/24 plain, 1/24 marked) → BR is the marked finder, TL the plain one farthest from it, TR/BL by cross product (a mirrored assignment is also tried) → homography from the four core centroids → sample each module (5 taps) → threshold against the 9×9-module local mean → packet → CRC. Only CRC-valid packets reach the per-session LT decoder, so torn rolling-shutter frames are just erasures. Measured limits on synthetic frames: needs ≥4 px/module; tolerates blur up to ~½ module, any rotation, keystone, 35% brightness gradient.
+Camera frame (downscaled to ≤1280 px) → worker → luma → Bradley adaptive threshold (12% and ≥12 levels below local mean) → 4-connected components → finder = dark ring whose hole holds a separate dark core (core/ring area ≈ 9/24 plain, 1/24 marked) → BR is the marked finder, TL the plain one farthest from it, TR/BL by cross product (a mirrored assignment is also tried) → homography from the four core centroids → sample each module (5 taps). If the border is colourful: per-side palette from the border, nearest-colour classification, 3 planes → 3 packets. Otherwise, or for a failed plane 0: threshold luma against the 9×9-module local mean, then against a border-learned cut → packet → CRC. Only CRC-valid packets reach the per-session LT decoder, so torn rolling-shutter frames are just erasures. The decoder peels and, when peeling stalls, runs GF(2) Gaussian elimination on the residual (inactivation decoding); repair degrees are `max(soliton + 2, K/4 ± parity)`. Measured limits on synthetic frames: needs ≥4 px/module; tolerates blur up to ~½ module, any rotation, keystone, 35% brightness gradient.
 
 Planned v2 header fields: payload type (raw / neural-json / handshake), compression flag, encryption flag, and a SHA-256 manifest carried in a dedicated frame.

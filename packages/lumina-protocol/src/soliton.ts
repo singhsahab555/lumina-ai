@@ -1,8 +1,8 @@
 // Robust Soliton degree distribution (Luby, 2002).
-// c and delta are the standard tuning knobs. Benchmarked (40 sessions each):
-// c=0.05/delta=0.5 gives median repair-only overhead of ~26% at K=200 and
-// ~16% at K=400. Peeling alone cannot reach ~5%; that needs an inactivation
-// (Gaussian elimination) fallback, planned for Day 4.
+// c and delta are the standard tuning knobs. With peeling alone,
+// c=0.05/delta=0.5 gave ~26% median repair-only overhead at K=200. The
+// decoder now falls back to Gaussian elimination and lt.ts shifts repair
+// degrees (+2, floor K/4), which brings it to ~2 extra droplets (LOG Day 4).
 
 import type { Rng } from './prng.ts';
 
