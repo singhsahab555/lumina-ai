@@ -90,3 +90,21 @@ test('handles payload smaller than one block', () => {
   dec.add(enc.next());
   assert.deepEqual(dec.result(), data);
 });
+
+test('1 MB file at 25% loss decodes incrementally with tiny overhead', () => {
+  const data = randomBytes(1_000_000, 21);
+  const enc = new LTEncoder(data, 436, 0x1a7e);
+  const dec = new LTDecoder(enc.config);
+  const loss = mulberry32(9);
+  let seed = 0;
+  const t0 = performance.now();
+  while (!dec.done && seed < enc.k * 2) {
+    const d = enc.droplet(seed++);
+    if (loss() >= 0.25) dec.add(d);
+  }
+  assert.ok(dec.done);
+  assert.ok(dec.received - enc.k <= 10, `overhead ${dec.received - enc.k} droplets`);
+  // The Day 4 decoder re-ran full elimination and took seconds here; a generous bound.
+  assert.ok(performance.now() - t0 < 5000);
+  assert.deepEqual(dec.result(), data);
+});

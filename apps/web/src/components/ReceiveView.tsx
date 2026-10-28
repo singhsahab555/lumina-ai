@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Point } from '@lumina/protocol';
 import type { ReceivedFile, RxStats } from '../lib/receiver.ts';
 import type { RxRequest, RxResponse } from '../lib/receiver.worker.ts';
-import { Stat, formatBytes } from './Stat.tsx';
+import { Stat, formatBytes, formatDuration } from './Stat.tsx';
 
 // Frames are downscaled to this long side before decoding: plenty for the
 // ≥4 px/module the detector needs, and it keeps decode time near 30 ms.
@@ -49,6 +49,7 @@ export function ReceiveView() {
     run.current?.stop();
     setError(null);
     setFile(null);
+    setElapsed(0);
     setStats(null);
     setPhase('starting');
     try {
@@ -87,6 +88,7 @@ export function ReceiveView() {
           if (msg.report.valid && !firstValid) firstValid = now;
           if (now - windowStart > 500) {
             setPerf({ fps: Math.round((replies * 1000) / (now - windowStart)), ms: msg.ms });
+            if (firstValid) setElapsed((now - firstValid) / 1000);
             replies = 0;
             windowStart = now;
           }
@@ -143,6 +145,10 @@ export function ReceiveView() {
   };
 
   const progress = stats && stats.k ? stats.solved / stats.k : 0;
+  // Rank grows ~1 per unique droplet, so the remaining blocks over the recent
+  // droplet rate is an honest ETA (plus a couple of droplets of overhead).
+  const dropletRate = elapsed > 1 && stats ? stats.received / elapsed : 0;
+  const eta = dropletRate && stats && stats.k ? (stats.k - stats.solved + 2) / dropletRate : null;
   const scanning = phase === 'scanning' || phase === 'starting';
 
   return (
@@ -216,6 +222,12 @@ export function ReceiveView() {
               <Stat label="Unique droplets" value={`${stats.received}`} testId="rx-unique" />
               <Stat label="Colors seen" value={`${stats.colors}`} testId="rx-colors" />
               <Stat label="Droplets / frame" value={stats.valid ? (stats.packets / stats.valid).toFixed(2) : '-'} testId="rx-dpf" />
+              {phase !== 'done' && (
+                <>
+                  <Stat label="Droplets / s" value={dropletRate ? dropletRate.toFixed(1) : '-'} testId="rx-rate" />
+                  <Stat label="ETA" value={eta === null ? '-' : formatDuration(eta)} testId="rx-eta" />
+                </>
+              )}
             </div>
           </>
         )}

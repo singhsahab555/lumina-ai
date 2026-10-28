@@ -17,6 +17,7 @@ import { robustSolitonCdf, sampleDegree, sampleIndices, type SolitonParams, DEFA
 // to the all-ones vector, which caps the rank at K-1. Wire format.
 const DEGREE_BOOST = 2;
 const DENSE_FLOOR_DIVISOR = 4;
+const DENSE_FLOOR_CAP = 256;
 
 export interface Droplet {
   seed: number;
@@ -59,7 +60,7 @@ export class DropletPlanner {
     if (seed < this.k) return [seed];
     const rng = dropletRng(seed, this.sessionId);
     const degree = sampleDegree(this.cdf, rng) + DEGREE_BOOST;
-    const floor = Math.ceil(this.k / DENSE_FLOOR_DIVISOR) + (rng() < 0.5 ? 1 : 0);
+    const floor = Math.min(Math.ceil(this.k / DENSE_FLOOR_DIVISOR), DENSE_FLOOR_CAP) + (rng() < 0.5 ? 1 : 0);
     return sampleIndices(this.k, Math.min(this.k, Math.max(degree, floor)), rng);
   }
 }
@@ -94,24 +95,51 @@ export class LTEncoder {
   }
 }
 
-interface Pending {
-  indices: Set<number>;
+// One equation of the residual GF(2) system: a bit per unsolved block it
+// still references, and the XOR of those blocks. As a pivot row (echelon
+// form) it has no bits below its pivot column.
+interface Row {
+  bits: Uint32Array;
   data: Uint8Array;
+  weight: number;
+  pivot: number;
 }
 
+function popcount(x: number): number {
+  x -= (x >>> 1) & 0x55555555;
+  x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
+  return (((x + (x >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24;
+}
+
+function lowestBit(bits: Uint32Array, from: number): number {
+  for (let w = from; w < bits.length; w++) {
+    const v = bits[w];
+    if (v) return (w << 5) + 31 - Math.clz32(v & -v);
+  }
+  return -1;
+}
+
+// Incremental decoding. Systematic droplets solve their block directly; every
+// other droplet is reduced on arrival against the pivot rows of a GF(2)
+// echelon form, so each droplet costs at most (rank × row width) word XORs
+// and no step re-runs a full elimination (the Day 4 decoder did, and froze
+// the receiver on multi-MB files). A block solved meanwhile is XORed out of
+// every pivot row, which subsumes peeling: rows that drop to one bit solve
+// their block and cascade. Once solved + rank == K, back-substitution from
+// the highest pivot down recovers the rest.
 export class LTDecoder {
   readonly config: LTConfig;
   readonly k: number;
   private readonly planner: DropletPlanner;
   private readonly blocks: (Uint8Array | null)[];
-  private readonly waiting = new Map<number, Set<Pending>>();
-  /** Droplets still referencing 2+ unsolved blocks: the residual system. */
-  private readonly pending = new Set<Pending>();
+  private readonly words: number;
+  private readonly pivots: (Row | null)[];
+  private readonly rows = new Set<Row>();
+  private readonly queue: Row[] = [];
   private readonly seenSeeds = new Set<number>();
   private solved = 0;
-  private nextInactivation = 0;
   received = 0;
-  /** Blocks recovered by Gaussian elimination rather than peeling. */
+  /** Blocks recovered from multi-block equations (elimination) rather than a degree-1 droplet. */
   inactivated = 0;
 
   constructor(config: LTConfig) {
@@ -119,10 +147,13 @@ export class LTDecoder {
     this.planner = new DropletPlanner(config);
     this.k = this.planner.k;
     this.blocks = new Array(this.k).fill(null);
+    this.pivots = new Array(this.k).fill(null);
+    this.words = (this.k + 31) >>> 5;
   }
 
+  /** Rank recovered / K: grows with every useful droplet, reaches 1 exactly when done. */
   get progress(): number {
-    return this.solved / this.k;
+    return this.done ? 1 : (this.solved + this.rows.size) / this.k;
   }
 
   get done(): boolean {
@@ -140,127 +171,108 @@ export class LTDecoder {
     this.received++;
 
     const data = droplet.data.slice();
-    const indices = new Set<number>();
+    const unknown: number[] = [];
     for (const i of this.planner.indicesFor(droplet.seed)) {
       const known = this.blocks[i];
       if (known) xorInto(data, known);
-      else indices.add(i);
+      else unknown.push(i);
     }
-
-    if (indices.size === 0) return this.done;
-    if (indices.size === 1) {
-      this.resolve(indices.values().next().value as number, data);
-      return this.done;
+    if (unknown.length === 0) return this.done;
+    if (unknown.length === 1) {
+      this.solve(unknown[0], data);
+    } else {
+      const bits = new Uint32Array(this.words);
+      for (const i of unknown) bits[i >>> 5] |= 1 << (i & 31);
+      this.queue.push({ bits, data, weight: unknown.length, pivot: -1 });
     }
-
-    const pending: Pending = { indices, data };
-    this.pending.add(pending);
-    for (const i of indices) {
-      let set = this.waiting.get(i);
-      if (!set) this.waiting.set(i, (set = new Set()));
-      set.add(pending);
-    }
-    const unknown = this.k - this.solved;
-    if (this.pending.size >= unknown && this.received >= this.nextInactivation) {
-      // Retry spacing grows with the system size so big files stay cheap.
-      if (!this.inactivate()) this.nextInactivation = this.received + 1 + (unknown >>> 8);
-    }
+    this.drain();
+    if (this.solved + this.rows.size === this.k) this.backSubstitute();
     return this.done;
   }
 
-  // Inactivation decoding: when peeling stalls, the residual droplets form a
-  // linear system over GF(2) in the unsolved blocks. A bits-only elimination
-  // checks it has full rank; only then is the (expensive) block data reduced.
-  // This turns the ~25% repair-only overhead of pure peeling into ~2 droplets.
-  private inactivate(): boolean {
-    const cols: number[] = [];
-    const colOf = new Map<number, number>();
-    for (let i = 0; i < this.k; i++) {
-      if (!this.blocks[i]) {
-        colOf.set(i, cols.length);
-        cols.push(i);
+  // Reduces queued rows into the echelon form.
+  private drain(): void {
+    while (this.queue.length > 0) {
+      const row = this.queue.pop()!;
+      const { bits } = row;
+      let from = 0;
+      while (row.weight > 0) {
+        const c = lowestBit(bits, from);
+        if (c < 0) break;
+        from = c >>> 5;
+        const known = this.blocks[c];
+        if (known) {
+          // A block solved while this row waited in the queue.
+          bits[from] &= ~(1 << (c & 31));
+          xorInto(row.data, known);
+          row.weight--;
+          continue;
+        }
+        if (row.weight === 1) {
+          this.inactivated++;
+          this.solve(c, row.data);
+          break;
+        }
+        const p = this.pivots[c];
+        if (!p) {
+          row.pivot = c;
+          this.pivots[c] = row;
+          this.rows.add(row);
+          break;
+        }
+        let weight = 0;
+        for (let x = from; x < bits.length; x++) weight += popcount((bits[x] ^= p.bits[x]));
+        row.weight = weight;
+        xorInto(row.data, p.data);
       }
     }
-    const n = cols.length;
-    const words = (n + 31) >>> 5;
-    const eqs = [...this.pending];
-    const bits = eqs.map((p) => {
-      const row = new Uint32Array(words);
-      for (const i of p.indices) {
-        const c = colOf.get(i)!;
-        row[c >>> 5] |= 1 << (c & 31);
-      }
-      return row;
-    });
-
-    // Pass 1: rank check on a copy of the bit rows.
-    const probe = bits.map((r) => r.slice());
-    let rank = 0;
-    for (let c = 0; c < n && rank < n; c++) {
-      const w = c >>> 5;
-      const m = 1 << (c & 31);
-      let r = rank;
-      while (r < probe.length && !(probe[r][w] & m)) r++;
-      if (r === probe.length) return false;
-      [probe[rank], probe[r]] = [probe[r], probe[rank]];
-      const pivot = probe[rank];
-      for (let j = rank + 1; j < probe.length; j++) {
-        const row = probe[j];
-        if (row[w] & m) for (let x = w; x < words; x++) row[x] ^= pivot[x];
-      }
-      rank++;
-    }
-
-    // Pass 2: Gauss-Jordan with data, so each pivot row ends as one block.
-    const data = eqs.map((p) => p.data.slice());
-    for (let c = 0; c < n; c++) {
-      const w = c >>> 5;
-      const m = 1 << (c & 31);
-      let r = c;
-      while (!(bits[r][w] & m)) r++;
-      [bits[c], bits[r]] = [bits[r], bits[c]];
-      [data[c], data[r]] = [data[r], data[c]];
-      const pivot = bits[c];
-      for (let j = 0; j < bits.length; j++) {
-        if (j === c || !(bits[j][w] & m)) continue;
-        const row = bits[j];
-        for (let x = 0; x < words; x++) row[x] ^= pivot[x];
-        xorInto(data[j], data[c]);
-      }
-    }
-    this.inactivated += n;
-    for (let c = 0; c < n; c++) this.resolve(cols[c], data[c]);
-    this.pending.clear();
-    this.waiting.clear();
-    return true;
   }
 
-  // Belief-propagation "peeling": each newly solved block is XORed out of every
-  // droplet that references it, which may cascade into more degree-1 droplets.
-  private resolve(index: number, data: Uint8Array): void {
-    const queue: [number, Uint8Array][] = [[index, data]];
-    while (queue.length > 0) {
-      const [i, block] = queue.pop()!;
-      if (this.blocks[i]) continue;
-      this.blocks[i] = block;
-      this.solved++;
-
-      const dependents = this.waiting.get(i);
-      if (!dependents) continue;
-      this.waiting.delete(i);
-      for (const p of dependents) {
-        xorInto(p.data, block);
-        p.indices.delete(i);
-        if (p.indices.size === 1) {
-          const last = p.indices.values().next().value as number;
-          this.waiting.get(last)?.delete(p);
-          this.pending.delete(p);
-          queue.push([last, p.data]);
-        } else if (p.indices.size === 0) {
-          this.pending.delete(p);
-        }
+  // Records a solved block and XORs it out of every pivot row. A row that
+  // loses its pivot, or drops to one bit, goes back through drain().
+  private solve(index: number, data: Uint8Array): void {
+    if (this.blocks[index]) return;
+    this.blocks[index] = data;
+    this.solved++;
+    const w = index >>> 5;
+    const m = 1 << (index & 31);
+    for (const row of this.rows) {
+      if (!(row.bits[w] & m)) continue;
+      row.bits[w] &= ~m;
+      xorInto(row.data, data);
+      row.weight--;
+      if (row.pivot === index || row.weight <= 1) {
+        this.rows.delete(row);
+        this.pivots[row.pivot] = null;
+        row.pivot = -1;
+        this.queue.push(row);
       }
     }
+  }
+
+  // Every unsolved block has a pivot row now, and a row only references
+  // blocks at or above its pivot, so solving from the top down needs only
+  // blocks that are already known.
+  private backSubstitute(): void {
+    for (let c = this.k - 1; c >= 0; c--) {
+      const row = this.pivots[c];
+      if (!row) continue;
+      const { bits, data } = row;
+      for (let w = c >>> 5; w < bits.length; w++) {
+        let v = bits[w];
+        while (v) {
+          const low = v & -v;
+          v ^= low;
+          const j = (w << 5) + 31 - Math.clz32(low);
+          if (j !== c) xorInto(data, this.blocks[j]!);
+        }
+      }
+      this.blocks[c] = data;
+      this.pivots[c] = null;
+      this.solved++;
+      this.inactivated++;
+    }
+    this.rows.clear();
   }
 
   result(): Uint8Array {

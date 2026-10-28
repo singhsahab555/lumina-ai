@@ -2,6 +2,24 @@
 
 Measured numbers per day. Newest first.
 
+## Day 4½: large files (Wed Oct 28)
+
+- **Bug from the first real-tablet test:** files around 43 KB arrived fine, but 1–10 MB files hung at "recovering". The Day 4 decoder re-ran a full GF(2) elimination (O(n³/32)) every few droplets once peeling stalled, which froze the worker. The K/4 repair-degree floor also made every droplet touch thousands of blocks (encoder 6.6 ms per droplet at 10 MB).
+- **Fix: incremental elimination.** Each droplet is reduced on arrival against the pivot rows of an echelon form. A block solved meanwhile is XORed out of every pivot row, which subsumes peeling. Back-substitution runs once, at the end. Progress is now rank/K, so the bar moves with every useful droplet.
+- **Wire format v3:** the repair-degree floor is capped at 256 (`min(K/4, 256)` ± random parity). This is unchanged for K ≤ 1024 (files under ~440 KB deflated).
+- Measured in Node, random data, 436 B blocks:
+
+  | File | Loss | Extra droplets | Decode CPU total | Worst single droplet |
+  |---|---|---|---|---|
+  | 1 MB | 3% / 25% | 2 / 1 | 0.03 s / 0.19 s | 2 ms / 38 ms |
+  | 5 MB | 3% / 25% | 0 / 6 | 0.12 s / 4.7 s | 9 ms / 1.2 s |
+  | 10 MB | 3% / 25% | 2 / 3 | 0.44 s / 24.6 s | 39 ms / 5.5 s (the final back-substitution) |
+
+  The encoder now takes ~0.01–0.07 ms per droplet.
+- **UI changes:** the transmitter shows the minimum time over light (one pass of K droplets) and warns above 2 min. The receiver shows droplets/s and an ETA.
+- **The light channel is now the limit:** 1 MB ≈ 2,300 droplets, about 30 s at 8-color 30 sym/s with a perfect camera; minutes on a real tablet.
+- Browser e2e, unchanged at K = 69: 2-color 4.3 KB/s, 8-color 13.3 KB/s, Auto 10.1 KB/s. All byte-exact.
+
 ## Day 4: 8-color, calibration border, inactivation decoding (Wed Oct 28)
 
 - **Wire format v2** (packet `VERSION = 2`). The grid edge rows/columns between finders are now a calibration border (192 modules). Data modules: 3,648 = 456 B per plane, so the max block size is 436 B (was 460).

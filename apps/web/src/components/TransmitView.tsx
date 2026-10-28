@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MAX_BLOCK_SIZE, sealEnvelope, sha256, toHex } from '@lumina/protocol';
 import { GridCanvas, type GridCanvasHandle } from './GridCanvas.tsx';
-import { Stat, formatBytes } from './Stat.tsx';
+import { Stat, formatBytes, formatDuration } from './Stat.tsx';
 import { deflateRaw } from '../lib/deflate.ts';
 import { Transmitter, dropletsPerSymbol, randomSessionId, type TxMode } from '../lib/transmitter.ts';
 import { startScheduler, type SchedulerStats } from '../lib/scheduler.ts';
@@ -93,6 +93,8 @@ export function TransmitView() {
 
   const k = tx.current?.k ?? 0;
   const repair = payload !== null && seed >= k;
+  // One pass of K droplets is the floor for any receiver; camera loss adds to it.
+  const passSeconds = k / ((stats.symbolsPerSecond || rate) * dropletsPerSymbol(mode));
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row">
@@ -186,6 +188,12 @@ export function TransmitView() {
             <Stat label="Display" value={`${stats.refreshHz} Hz`} />
             <Stat label="Raw rate" value={`${formatBytes(Math.round(stats.symbolsPerSecond * MAX_BLOCK_SIZE * dropletsPerSymbol(mode)))}/s`} />
             <Stat label="Droplets sent" value={`${seed + 1}`} />
+            <Stat label="Min. time" value={formatDuration(passSeconds)} testId="tx-eta" />
+            {passSeconds > 120 && (
+              <p className="col-span-2 rounded-lg bg-amber-950 p-2 text-xs text-amber-200" data-testid="tx-large">
+                Large file: at least {formatDuration(passSeconds)} over light at this rate, more if the camera drops frames. Keep the receiver steady, or send a smaller file.
+              </p>
+            )}
             <div className="col-span-2">
               <Stat label="SHA-256" value={`${payload.sha256.slice(0, 16)}…`} testId="tx-sha" />
             </div>
