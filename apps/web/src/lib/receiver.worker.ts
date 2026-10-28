@@ -21,7 +21,15 @@ ctx.onmessage = async ({ data: msg }) => {
     return;
   }
   const t0 = performance.now();
-  const { report, payload } = rx.push({ width: msg.width, height: msg.height, data: new Uint8ClampedArray(msg.buffer) });
+  let result: ReturnType<ReceiverSession['push']>;
+  try {
+    result = rx.push({ width: msg.width, height: msg.height, data: new Uint8ClampedArray(msg.buffer) });
+  } catch (e) {
+    // Always answer, or the page waits for this frame forever.
+    ctx.postMessage({ type: 'error', message: `Decoder error: ${e instanceof Error ? e.message : String(e)}` });
+    return;
+  }
+  const { report, payload } = result;
   ctx.postMessage({ type: 'frame', report, stats: rx.stats(), ms: Math.round(performance.now() - t0) });
   if (!payload) return;
   try {

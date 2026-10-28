@@ -10,6 +10,8 @@ export default defineConfig(({ mode }) => ({
   // GitHub Pages serves the app under /<repo>/; the deploy workflow sets BASE.
   base: process.env.BASE ?? '/',
   worker: { format: 'es' },
+  // Shown in the UI, so a tablet running a stale cached build is easy to spot.
+  define: { __BUILD_ID__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ')) },
   plugins: [
     mode === 'lan' && basicSsl(),
     react(),

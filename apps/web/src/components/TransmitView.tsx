@@ -99,7 +99,7 @@ export function TransmitView() {
   return (
     <div className="flex flex-col gap-6 lg:flex-row">
       <aside className="flex w-full flex-col gap-4 lg:w-80 lg:shrink-0">
-        <p className="text-sm text-zinc-400">Transmitter · raw mode · {colors}-color</p>
+        <p className="text-sm text-zinc-400">Transmitter · raw mode · {colors}-color <span className="text-zinc-600">· build {__BUILD_ID__}</span></p>
 
         <label
           className="flex cursor-pointer flex-col items-center gap-1 rounded-xl border border-dashed border-zinc-700 px-4 py-6 text-center hover:border-yellow-400"

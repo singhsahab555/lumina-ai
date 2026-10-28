@@ -102,8 +102,17 @@ export function ReceiveView() {
           if (overlay.current) drawQuad(overlay.current, null, false);
           stop();
         } else {
+          busy = false;
           setError(msg.message);
         }
+      };
+      // A page left open across a deploy points at a worker file Pages no
+      // longer serves; without this the receiver just sits silent.
+      worker.onerror = (e) => {
+        e.preventDefault();
+        setError('STALE');
+        stop();
+        setPhase('idle');
       };
 
       const schedule = () =>
@@ -154,7 +163,9 @@ export function ReceiveView() {
   return (
     <div className="flex flex-col gap-6 lg:flex-row">
       <aside className="flex w-full flex-col gap-4 lg:w-80 lg:shrink-0">
-        <p className="text-sm text-zinc-400">Receiver · camera → finders → homography → LT</p>
+        <p className="text-sm text-zinc-400">
+          Receiver · camera → finders → homography → LT <span className="text-zinc-600">· build {__BUILD_ID__}</span>
+        </p>
 
         {!camera && (
           <p className="rounded-lg bg-red-950 p-3 text-sm text-red-300">
@@ -198,7 +209,16 @@ export function ReceiveView() {
           </select>
         )}
 
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error === 'STALE' ? (
+          <div className="flex flex-col gap-2 rounded-lg bg-red-950 p-3 text-sm text-red-300" data-testid="rx-stale">
+            The receiver code failed to load: this page is probably an old cached version.
+            <button className="rounded-md bg-red-800 px-3 py-1.5 text-white" onClick={() => location.reload()}>
+              Reload to update
+            </button>
+          </div>
+        ) : (
+          error && <p className="text-sm text-red-400">{error}</p>
+        )}
 
         {stats && (
           <>
