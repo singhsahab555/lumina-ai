@@ -19,7 +19,7 @@ The hackathon's rules require new work only. Everything in this repo was written
 
 | Commit / tag | When | Note |
 |---|---|---|
-| `pre-kickoff` (67a742d) | Oct 26, 09:27 ET | **Before the 12:00 PM ET kickoff**: LT codec, frame format, and docs, written ~2.5 h early. Disclosed openly. |
+| `pre-kickoff` (ef34d82) | Oct 26, 09:27 ET | **Before the 12:00 PM ET kickoff**: LT codec, frame format, and docs, written ~2.5 h early. Disclosed openly. |
 | everything after | Oct 26 kickoff → Nov 4 | All app, vision, model integration, and UI work |
 
 ## Repo layout
