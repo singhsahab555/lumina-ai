@@ -69,6 +69,7 @@ The reverse direction also works without certificates: phone transmits (plain `h
 - [Architecture](docs/ARCHITECTURE.md)
 - [10-day build plan](docs/PLAN-10-DAY.md)
 - [Build log with measured numbers](docs/LOG.md)
+- [Meta AI integration](META_AI_INTEGRATION.md)
 
 ## Meta models used
 
