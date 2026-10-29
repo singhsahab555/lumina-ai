@@ -67,7 +67,8 @@ export function ReceiveView() {
       const grab = document.createElement('canvas');
       const g = grab.getContext('2d', { willReadFrequently: true })!;
       let running = true;
-      let busy = false;
+      // Two frames in flight: the next grab overlaps the current decode.
+      let inFlight = 0;
       let replies = 0;
       let windowStart = performance.now();
       let firstValid = 0;
@@ -82,7 +83,7 @@ export function ReceiveView() {
 
       worker.onmessage = ({ data: msg }: MessageEvent<RxResponse>) => {
         if (msg.type === 'frame') {
-          busy = false;
+          inFlight--;
           replies++;
           const now = performance.now();
           if (msg.report.valid && !firstValid) firstValid = now;
@@ -102,7 +103,7 @@ export function ReceiveView() {
           if (overlay.current) drawQuad(overlay.current, null, false);
           stop();
         } else {
-          busy = false;
+          inFlight--;
           setError(msg.message);
         }
       };
@@ -119,7 +120,7 @@ export function ReceiveView() {
         'requestVideoFrameCallback' in v ? v.requestVideoFrameCallback(tick) : requestAnimationFrame(tick);
       const tick = () => {
         if (!running) return;
-        if (!busy && v.videoWidth) {
+        if (inFlight < 2 && v.videoWidth) {
           const scale = Math.min(1, MAX_SIDE / Math.max(v.videoWidth, v.videoHeight));
           const w = Math.round(v.videoWidth * scale);
           const h = Math.round(v.videoHeight * scale);
@@ -133,7 +134,7 @@ export function ReceiveView() {
           }
           g.drawImage(v, 0, 0, w, h);
           const img = g.getImageData(0, 0, w, h);
-          busy = true;
+          inFlight++;
           const req: RxRequest = { type: 'frame', width: w, height: h, buffer: img.data.buffer };
           worker.postMessage(req, [img.data.buffer]);
         }

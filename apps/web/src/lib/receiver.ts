@@ -3,7 +3,7 @@
 // Each session id gets its own decoder, so a stray frame from an old transfer
 // still on someone's screen cannot poison the current one.
 
-import { LTDecoder, openEnvelope, readFrame, toHex, type Colors, type Point, type RgbaImage } from '@lumina/protocol';
+import { LTDecoder, openEnvelope, readFrame, toHex, type Colors, type Homography, type Point, type RgbaImage } from '@lumina/protocol';
 import { inflateRaw } from './deflate.ts';
 
 const MAX_SESSIONS = 4;
@@ -50,11 +50,14 @@ export class ReceiverSession {
   valid = 0;
   packets = 0;
   colors: Colors = 2;
+  // Where the grid was in the last valid frame: tried first on the next one.
+  private prior: Homography | null = null;
 
   /** Returns the compressed payload once its decoder completes. */
   push(img: RgbaImage): { report: FrameReport; payload: Uint8Array | null } {
     this.frames++;
-    const r = readFrame(img);
+    const r = readFrame(img, this.prior);
+    if (r.homography) this.prior = r.homography;
     if (r.quad) {
       this.located++;
       this.colors = r.colors;

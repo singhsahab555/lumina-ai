@@ -41,6 +41,8 @@ export interface FrameRead {
   /** Mode the calibration border showed (2 unless it was seen in colour). */
   colors: Colors;
   finders: Finder[];
+  /** Module space → image mapping that produced a CRC-valid packet, for the next frame. */
+  homography: Homography | null;
 }
 
 // Finder centres in module space (continuous: module m spans [m, m + 1]).
@@ -470,7 +472,7 @@ interface GridRead {
   colors: Colors;
 }
 
-function decodeGrid(g: GrayImage, rgba: RgbaImage | null, hm: Homography): GridRead {
+function decodeGrid(gray: () => GrayImage, rgba: RgbaImage | null, hm: Homography): GridRead {
   let colorRead: GridRead | null = null;
   if (rgba) {
     const rgb = sampleRgb(rgba, hm);
@@ -484,7 +486,7 @@ function decodeGrid(g: GrayImage, rgba: RgbaImage | null, hm: Homography): GridR
   }
   // 2-color frames, and the fallback for plane 0 of an 8-color one: a luma
   // threshold separates G-on from G-off even when hue is unreliable.
-  const values = sampleLuma(g, hm);
+  const values = sampleLuma(gray(), hm);
   let modules = values && localMeanThreshold(values);
   let p0 = modules ? decodePacket(modulesToPacket(modules)) : null;
   if (values && !p0) {
@@ -501,28 +503,43 @@ function decodeGrid(g: GrayImage, rgba: RgbaImage | null, hm: Homography): GridR
 
 const MAX_ATTEMPTS = 8;
 
-/** Locates, samples and CRC-checks one camera frame. Never throws on bad input. */
-export function readFrame(img: RgbaImage | GrayImage): FrameRead {
+function outline(hm: Homography): Point[] {
+  return [
+    [0, 0],
+    [GRID_SIZE, 0],
+    [GRID_SIZE, GRID_SIZE],
+    [0, GRID_SIZE],
+  ].map(([x, y]) => applyHomography(hm, x, y));
+}
+
+/**
+ * Locates, samples and CRC-checks one camera frame. Never throws on bad input.
+ *
+ * `prior` is the homography of the last valid frame. A camera held still sees
+ * the grid in the same place, so sampling through it first skips the finder
+ * search (threshold + components over every pixel, ~90% of the cost). The
+ * CRC rejects a stale mapping, and then the full search runs as usual.
+ */
+export function readFrame(img: RgbaImage | GrayImage, prior: Homography | null = null): FrameRead {
   const isGray = img.data.length === img.width * img.height;
-  const g = isGray ? (img as GrayImage) : toGray(img as RgbaImage);
+  let g: GrayImage | null = isGray ? (img as GrayImage) : null;
+  const gray = () => (g ??= toGray(img as RgbaImage));
   const rgba = isGray ? null : (img as RgbaImage);
-  const finders = findFinders(g);
+  if (prior) {
+    const r = decodeGrid(gray, rgba, prior);
+    if (r.packets.length) return { quad: outline(prior), ...r, packet: r.packets[0], finders: [], homography: prior };
+  }
+  const finders = findFinders(gray());
   let first: FrameRead | null = null;
   let attempts = 0;
   for (const centers of cornerSets(finders)) {
     if (attempts++ >= MAX_ATTEMPTS) break;
     const hm = solveHomography(FINDER_CENTERS, centers);
     if (!hm) continue;
-    const quad = [
-      [0, 0],
-      [GRID_SIZE, 0],
-      [GRID_SIZE, GRID_SIZE],
-      [0, GRID_SIZE],
-    ].map(([x, y]) => applyHomography(hm, x, y));
-    const r = decodeGrid(g, rgba, hm);
-    const read: FrameRead = { quad, ...r, packet: r.packets[0] ?? null, finders };
+    const r = decodeGrid(gray, rgba, hm);
+    const read: FrameRead = { quad: outline(hm), ...r, packet: r.packets[0] ?? null, finders, homography: r.packets.length ? hm : null };
     if (read.packet) return read;
     first ??= read;
   }
-  return first ?? { quad: null, modules: null, packet: null, packets: [], colors: 2, finders };
+  return first ?? { quad: null, modules: null, packet: null, packets: [], colors: 2, finders, homography: null };
 }
