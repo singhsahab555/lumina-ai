@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { MAX_BLOCK_SIZE, sealEnvelope, sha256, toHex } from '@lumina/protocol';
 import { GridCanvas, type GridCanvasHandle } from './GridCanvas.tsx';
+import { PackerPanel } from './PackerPanel.tsx';
 import { Stat, formatBytes, formatDuration } from './Stat.tsx';
 import { deflateRaw } from '../lib/deflate.ts';
 import { Transmitter, dropletsPerSymbol, randomSessionId, type TxMode } from '../lib/transmitter.ts';
 import { startScheduler, type SchedulerStats } from '../lib/scheduler.ts';
 
-const SAMPLE_URL = `${import.meta.env.BASE_URL}samples/pump-station-log.txt`;
+const sampleUrl = (name: string) => `${import.meta.env.BASE_URL}samples/${name}`;
 
 interface Payload {
   name: string;
@@ -81,9 +82,9 @@ export function TransmitView() {
     if (file) await load(file.name, new Uint8Array(await file.arrayBuffer()));
   };
 
-  const loadSample = async () => {
-    const res = await fetch(SAMPLE_URL);
-    await load('pump-station-log.txt', new Uint8Array(await res.arrayBuffer()));
+  const loadSample = async (name: string) => {
+    const res = await fetch(sampleUrl(name));
+    await load(name, new Uint8Array(await res.arrayBuffer()));
   };
 
   const step = () => {
@@ -115,11 +116,12 @@ export function TransmitView() {
         </label>
         <button
           className="rounded-lg bg-zinc-800 px-3 py-2 text-sm hover:bg-zinc-700"
-          onClick={() => void loadSample()}
+          onClick={() => void loadSample('pump-station-log.txt')}
           data-testid="sample"
         >
           Load sample work order
         </button>
+        <PackerPanel onBeam={(name, bytes) => void load(name, bytes)} />
 
         <div className="rounded-xl bg-zinc-900 p-3">
           <div className="mb-2 flex items-center justify-between text-sm">

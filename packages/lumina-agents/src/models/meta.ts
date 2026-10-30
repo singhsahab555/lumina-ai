@@ -7,12 +7,78 @@ import { ModelHttpError, type ChatMessage, type ChatModel, type ChatRequest, typ
 export const META_BASE_URL = 'https://api.meta.ai/v1';
 export const SPARK_MODEL = 'muse-spark-1.3';
 export const SAM_MODEL = 'sam-3.1';
+export const NVIDIA_BASE_URL = 'https://integrate.api.nvidia.com/v1';
+export const NVIDIA_GLIMMER_MODEL = 'meta/muse-glimmer-30b';
+
+/**
+ * Packer model for the connected sender: Muse Spark on the Meta Model API when
+ * there is a key, else Meta's open-weight Muse Glimmer 30B on NVIDIA NIM (same
+ * wire format, streamed). Null when neither key is set.
+ */
+export function packerFromEnv(env: Record<string, string | undefined>): MetaChatModel | null {
+  if (env.MODEL_API_KEY) return new MetaChatModel({ apiKey: env.MODEL_API_KEY, baseUrl: env.META_BASE_URL, model: env.SPARK_MODEL });
+  if (env.NVIDIA_API_KEY) {
+    return new MetaChatModel({
+      apiKey: env.NVIDIA_API_KEY,
+      baseUrl: env.NVIDIA_BASE_URL || NVIDIA_BASE_URL,
+      model: env.NVIDIA_MODEL || NVIDIA_GLIMMER_MODEL,
+      provider: 'nvidia',
+      stream: true,
+    });
+  }
+  return null;
+}
 
 export interface MetaConfig {
   apiKey: string;
   baseUrl?: string;
   model?: string;
+  /** Trace label prefix; 'nvidia' when the same wire format goes to NVIDIA NIM. */
+  provider?: string;
+  /** Stream the reply (SSE). NVIDIA NIM's gateway 504s on long non-streamed reasoning replies. */
+  stream?: boolean;
   fetch?: typeof fetch;
+}
+
+type WireToolCall = { id: string; function: { name: string; arguments: string } };
+
+function fromWire(content: string | null, toolCalls: WireToolCall[] | undefined): ChatResponse {
+  return {
+    content: content ?? '',
+    toolCalls: (toolCalls ?? []).map((t) => ({ id: t.id, name: t.function.name, arguments: JSON.parse(t.function.arguments || '{}') })),
+  };
+}
+
+/** Reads a chat-completions SSE stream. reasoning_content deltas are dropped; content and tool-call deltas are joined. */
+async function readStream(res: Response): Promise<ChatResponse> {
+  let content = '';
+  const calls: WireToolCall[] = [];
+  const reader = res.body!.pipeThrough(new TextDecoderStream()).getReader();
+  let buf = '';
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += value;
+    const lines = buf.split('\n');
+    buf = lines.pop()!;
+    for (const line of lines) {
+      if (!line.startsWith('data:')) continue;
+      const data = line.slice(5).trim();
+      if (data === '[DONE]') return fromWire(content, calls);
+      const delta = (JSON.parse(data) as {
+        choices: { delta: { content?: string | null; tool_calls?: { index: number; id?: string; function?: { name?: string; arguments?: string } }[] } }[];
+      }).choices[0]?.delta;
+      if (!delta) continue;
+      content += delta.content ?? '';
+      for (const t of delta.tool_calls ?? []) {
+        const call = (calls[t.index] ??= { id: '', function: { name: '', arguments: '' } });
+        if (t.id) call.id = t.id;
+        call.function.name += t.function?.name ?? '';
+        call.function.arguments += t.function?.arguments ?? '';
+      }
+    }
+  }
+  return fromWire(content, calls);
 }
 
 function toWire(m: ChatMessage): Record<string, unknown> {
@@ -32,18 +98,21 @@ export class MetaChatModel implements ChatModel {
   private readonly apiKey: string;
   private readonly baseUrl: string;
   private readonly model: string;
+  private readonly stream: boolean;
   private readonly doFetch: typeof fetch;
 
   constructor(cfg: MetaConfig) {
     this.apiKey = cfg.apiKey;
     this.baseUrl = cfg.baseUrl ?? META_BASE_URL;
     this.model = cfg.model ?? SPARK_MODEL;
+    this.stream = cfg.stream ?? false;
     this.doFetch = cfg.fetch ?? globalThis.fetch.bind(globalThis);
-    this.id = `meta:${this.model}`;
+    this.id = `${cfg.provider ?? 'meta'}:${this.model}`;
   }
 
   async chat(req: ChatRequest): Promise<ChatResponse> {
     const body: Record<string, unknown> = { model: this.model, messages: req.messages.map(toWire) };
+    if (this.stream) body.stream = true;
     if (req.temperature !== undefined) body.temperature = req.temperature;
     if (req.tools?.length) body.tools = req.tools.map((t) => ({ type: 'function', function: t }));
     if (req.jsonSchema) body.response_format = { type: 'json_schema', json_schema: { ...req.jsonSchema, strict: true } };
@@ -54,14 +123,10 @@ export class MetaChatModel implements ChatModel {
       body: JSON.stringify(body),
     });
     if (!res.ok) throw new ModelHttpError(res.status, await res.text());
-    const json = (await res.json()) as {
-      choices: { message: { content: string | null; tool_calls?: { id: string; function: { name: string; arguments: string } }[] } }[];
-    };
+    if (this.stream) return readStream(res);
+    const json = (await res.json()) as { choices: { message: { content: string | null; tool_calls?: WireToolCall[] } }[] };
     const msg = json.choices[0].message;
-    return {
-      content: msg.content ?? '',
-      toolCalls: (msg.tool_calls ?? []).map((t) => ({ id: t.id, name: t.function.name, arguments: JSON.parse(t.function.arguments || '{}') })),
-    };
+    return fromWire(msg.content, msg.tool_calls);
   }
 }
 

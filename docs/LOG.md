@@ -2,6 +2,19 @@
 
 Measured numbers per day. Newest first.
 
+## Day 5: semantic packer, live (Fri Oct 30)
+
+- Meta Model API key still blocked (billing hold), so the packer runs on **Meta's open-weight Muse Glimmer 30B hosted on NVIDIA NIM** (`meta/muse-glimmer-30b`). The CLI uses Spark automatically once `MODEL_API_KEY` is set; it falls back to NIM via `NVIDIA_API_KEY`.
+- Bug found: NIM returned **HTTP 504** after ~5 min on every non-streamed call, even a one-line ping. Glimmer is a reasoning model (`reasoning_content` first, then `content`), and the gateway times out waiting for the full reply. Fix: an SSE `stream` mode in `MetaChatModel` that drops reasoning and joins content and tool-call deltas.
+- **Measured:** `ps07-shift-log-45d.txt` **56,190 B → 1,610 B** schema-valid `lumina.work-order/v1` bundle (35× smaller, lossy summary). 3 attempts, 133–272 s per call, ~11 min total.
+- NIM does not enforce the strict `json_schema`: attempt 1 dropped `work_order_id`/`order`, attempt 2 dropped setpoint fields. Local validation + retry-with-errors fixed both. Retry reasons are now recorded in the trace.
+- Faithfulness check: all 7 steps and 4 setpoints match the log's action list (lines 867–872); the model split "alarm 7.1, trip 11.0" into two steps, per the one-action-per-step rule.
+- First run was **REJECTED** by the offline gate: the model wrote site "North Basin Water Treatment PS-07", while the policy says "North Basin WTP". Fix: `site` is now pinned by software (`LUMINA_SITE`, default the demo policy's site), like provenance. Re-run: no policy findings, verdict **HOLD** (fail-closed until Glimmer verifies on the receiver, Day 6).
+- **Web app: "Meta AI packer" panel** on the transmitter. A browser can't call NIM itself (no CORS, and the key would be public), so `apps/web/server/pack-api.ts` adds `/api/pack` to the Vite dev/preview server on the sender laptop. The key stays in `.env`; progress streams as NDJSON (attempts, retry reasons, 5 s keep-alive ticks). Then "Beam this bundle over light".
+- On GitHub Pages (static, no helper) the same panel replays the **recorded real run** (`ps07-work-order.run.json`, labelled "recorded run", real per-attempt timings) and beams the same bundle. The CLI now writes that run record next to every bundle.
+- A pack takes ~10 min, so the demo uses the recorded run or a pre-started live pack.
+- Tests: agents 18/18, protocol 28/28, web 7/7. Web build clean.
+
 ## Day 4½: large files (Wed Oct 28)
 
 - **Bug from the first real-tablet test:** files around 43 KB arrived fine, but 1–10 MB files hung at "recovering". The Day 4 decoder re-ran a full GF(2) elimination (O(n³/32)) every few droplets once peeling stalled, which froze the worker. The K/4 repair-degree floor also made every droplet touch thousands of blocks (encoder 6.6 ms per droplet at 10 MB).

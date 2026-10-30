@@ -23,6 +23,13 @@ test('packer retries with validation errors, then pins provenance to the real so
   assert.equal(model.requests[0].jsonSchema?.name, 'WorkOrderBundle');
   const retry = model.requests[1].messages.at(-1)!;
   assert.match(retry.content, /\$\.work_order_id: required/);
+  assert.match(res.trace[0].note ?? '', /^invalid: /);
+});
+
+test('packer pins the site the sender packs for over whatever the model wrote', async () => {
+  const model = new ScriptedModel([say(JSON.stringify({ ...validBundle(), site: 'North Basin Water Treatment PS-07' }))]);
+  const res = await packWorkOrder(model, { title: 'log.txt', text: sampleLog() }, { site: 'North Basin WTP' });
+  assert.equal(res.bundle.site, 'North Basin WTP');
 });
 
 test('packer gives up after maxAttempts with the last errors', async () => {
@@ -94,6 +101,30 @@ test('Meta adapter sends OpenAI-compatible strict structured output and parses t
   assert.equal(calls[0].headers.Authorization, 'Bearer k');
   assert.equal(calls[0].body.model, 'muse-spark-1.3');
   assert.deepEqual(calls[0].body.response_format, { type: 'json_schema', json_schema: { name: 'B', schema: { type: 'object' }, strict: true } });
+  assert.deepEqual(res.toolCalls, [{ id: 'c1', name: 'scan_text', arguments: { text: 'hi' } }]);
+});
+
+test('streamed replies (NVIDIA NIM) drop reasoning and join content and tool-call deltas across chunk splits', async () => {
+  const chunks = [
+    { reasoning_content: 'thinking...' },
+    { content: '{"ok":' },
+    { content: 'true}', tool_calls: [{ index: 0, id: 'c1', function: { name: 'scan_', arguments: '{"te' } }] },
+    { tool_calls: [{ index: 0, function: { name: 'text', arguments: 'xt":"hi"}' } }] },
+  ];
+  const sse = chunks.map((d) => `data: ${JSON.stringify({ choices: [{ delta: d }] })}\n\n`).join('') + 'data: [DONE]\n\n';
+  let sent: Record<string, unknown> = {};
+  const fn = (async (_url: string, init: RequestInit) => {
+    sent = JSON.parse(String(init.body));
+    // Split mid-line so the reader has to buffer partial SSE lines.
+    const parts = [sse.slice(0, 37), sse.slice(37, 150), sse.slice(150)];
+    return new Response(new ReadableStream({ start(c) { for (const p of parts) c.enqueue(new TextEncoder().encode(p)); c.close(); } }));
+  }) as unknown as typeof fetch;
+  const nim = new MetaChatModel({ apiKey: 'k', model: 'meta/muse-glimmer-30b', provider: 'nvidia', stream: true, fetch: fn });
+  const res = await nim.chat({ messages: [{ role: 'user', content: 'x' }] });
+
+  assert.equal(nim.id, 'nvidia:meta/muse-glimmer-30b');
+  assert.equal(sent.stream, true);
+  assert.equal(res.content, '{"ok":true}');
   assert.deepEqual(res.toolCalls, [{ id: 'c1', name: 'scan_text', arguments: { text: 'hi' } }]);
 });
 

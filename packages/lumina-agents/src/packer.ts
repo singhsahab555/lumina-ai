@@ -2,8 +2,8 @@
 // schema-valid work-order bundle that is then beamed over light.
 //
 // Lossy by design: the bundle is a semantic summary. Provenance fields
-// (kind, source title/bytes/SHA-256) are set here from the real input, never
-// taken from the model, and the hash identifies the source, not the bundle.
+// (kind, source title/bytes/SHA-256) and the site, when the sender knows it, are
+// set here, never taken from the model. The hash identifies the source, not the bundle.
 
 import { BUNDLE_SCHEMA_ID, PARAMETER_KEYS, WORK_ORDER_JSON_SCHEMA, validateBundle, type WorkOrderBundle } from './schema.ts';
 import { tracedChat, type ChatMessage, type ChatModel, type TraceEvent } from './models/types.ts';
@@ -50,7 +50,7 @@ function parseJson(text: string): unknown {
 export async function packWorkOrder(
   model: ChatModel,
   source: { title: string; text: string },
-  opts: { maxAttempts?: number } = {},
+  opts: { maxAttempts?: number; site?: string; onTrace?: (event: TraceEvent) => void } = {},
 ): Promise<PackResult> {
   const trace: TraceEvent[] = [];
   const sourceBytes = utf8(source.text);
@@ -70,15 +70,19 @@ export async function packWorkOrder(
     }, trace);
 
     const parsed = parseJson(res.content);
+    const report = () => opts.onTrace?.(trace[trace.length - 1]);
     if (parsed && typeof parsed === 'object') {
-      Object.assign(parsed, { schema: BUNDLE_SCHEMA_ID, kind: 'neural-summary', source: provenance });
+      Object.assign(parsed, { schema: BUNDLE_SCHEMA_ID, kind: 'neural-summary', source: provenance }, opts.site ? { site: opts.site } : {});
     }
     const result = validateBundle(parsed);
     if (result.ok) {
+      report();
       const json = JSON.stringify(result.bundle);
       return { bundle: result.bundle, json, sourceBytes: sourceBytes.length, bundleBytes: utf8(json).length, attempts: attempt, trace };
     }
     errors = result.errors;
+    trace[trace.length - 1].note = `invalid: ${errors.slice(0, 3).join('; ')}`;
+    report();
     messages.push(
       { role: 'assistant', content: res.content },
       { role: 'user', content: `That bundle is invalid:\n- ${errors.join('\n- ')}\nReturn the corrected bundle only.` },

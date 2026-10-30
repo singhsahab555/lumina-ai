@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import basicSsl from '@vitejs/plugin-basic-ssl';
+import { packApi } from './server/pack-api.ts';
 
 // `--mode lan` serves over self-signed HTTPS on the LAN: phones only grant
 // camera access to secure origins.
@@ -14,11 +15,13 @@ export default defineConfig(({ mode }) => ({
   define: { __BUILD_ID__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ')) },
   plugins: [
     mode === 'lan' && basicSsl(),
+    // Local Meta AI packer endpoint (dev/preview only; the Pages build is static).
+    packApi(),
     react(),
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon.svg', 'samples/*.txt'],
+      includeAssets: ['icon.svg', 'samples/*.txt', 'samples/*.json'],
       manifest: {
         name: 'LuminaAI',
         short_name: 'Lumina',
