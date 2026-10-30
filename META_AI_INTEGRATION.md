@@ -34,7 +34,7 @@ All model code is in [`packages/lumina-agents`](packages/lumina-agents). It has 
 | **Muse Spark Open** (`meta-models/muse-spark-open`) | Baseten, connected side | Packs the 56 KB shift log into a 1.7 KB `lumina.work-order/v1` bundle | **Live.** Recorded run: 1 attempt, 16 s. |
 | **Muse Spark** (`muse-spark-1.3`) | Meta Model API, connected side | Same packer, with strict structured output | Ready. Used automatically once `MODEL_API_KEY` is active (billing hold). |
 | **Muse Glimmer 30B** (open weights) | NVIDIA NIM, connected side | Packer fallback; red-team pass before sending | Packer: live (Day 5). Red-team: Day 8. |
-| **SAM 3.1** (`sam-3.1`) | Meta Model API, connected side | Finds the far screen for the return channel; crops what matters from a photo | Request builder done. Parser and UI: Day 7. |
+| **SAM 3.1** (`sam-3.1`) | Meta Model API, connected side | Finds the far screen for the return channel; crops what matters from a photo | Built and tested (parser, `/api/sam`, receiver region of interest). Live once the Meta Model API key clears. |
 | **Muse Glimmer 30B** (open weights) | Ollama on plant hardware, air-gapped side | Optional verifier agent behind the policy gate | Built and tested with a fake model. Not run in the demo (no hardware, see above). |
 
 ## Muse Spark: semantic packing
@@ -57,6 +57,13 @@ The transmitter has a **"Load tampered work order (attack demo)"** button. It be
 - tampered order → **REJECTED**, with both bad steps flagged in red, offline, in airplane mode
 
 The SHA-256 check proves the file arrived intact. It cannot prove the sender was honest, which is why the gate exists.
+
+## SAM 3.1: finding the plant screen for the return channel
+
+- The plant answers over light with a signed ack. The laptop webcam has to find a screen across the room, which may be small in the frame.
+- One still goes to SAM 3.1 with the prompt "computer monitor". The largest box becomes the region of interest, and the decoder reads only that region at native camera resolution. Every frame is then handled by classical finder tracking; SAM is called again only if the lock is lost.
+- Measured on a synthetic 1080p webcam with a far screen: 3/6 frames read from the downscaled whole frame, 6/6 from the SAM region.
+- SAM runs on the connected side only, since it is API-only. The plant never calls it.
 
 ## SAM 3.1: what to send from a photo
 

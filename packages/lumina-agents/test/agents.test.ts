@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { BASETEN_SPARK_MODEL, MetaChatModel, OllamaChatModel, PackError, packWorkOrder, packerFromEnv, samSegmentRequest, sha256Hex, verifyBundle } from '../src/index.ts';
+import { BASETEN_SPARK_MODEL, MetaChatModel, OllamaChatModel, PackError, packWorkOrder, packerFromEnv, parseSamOutput, samFindScreen, samFromEnv, samSegmentRequest, sha256Hex, verifyBundle } from '../src/index.ts';
 import { ScriptedModel, fakeFetch, policy, sampleLog, say, tamperedBundle, validBundle } from './helpers.ts';
 
 const call = (name: string, args: Record<string, unknown>, id = name) => ({ id, name, arguments: args });
@@ -176,6 +176,50 @@ test('SAM 3.1 request follows the Responses API shape', () => {
   const req = samSegmentRequest('computer monitor', 'data:image/jpeg;base64,AAAA') as any;
   assert.equal(req.model, 'sam-3.1');
   assert.deepEqual(req.input[0].content.map((c: { type: string }) => c.type), ['input_text', 'input_image']);
+});
+
+test('SAM 3.1 output: sparse ids, confidence, mask header, empty answer', () => {
+  // Shape from dev.meta.ai/docs/sam/reading-segmentation; payloads shortened.
+  const text =
+    '<0f>0<|box;x1=181;y1=365;x2=556;y2=486;w=1516;h=1600;c=0.91|><|mask;x=0;y=0;c=0.91;data=122,376,~0Q@%a|>,' +
+    '2<|box;x1=10;y1=20;x2=60;y2=50;w=1516;h=1600;c=0.40|><|mask;x=0;y=0;data=31,51,!8f|>';
+  const [a, b] = parseSamOutput(text);
+  assert.deepEqual(a.box, { x1: 181, y1: 365, x2: 556, y2: 486 });
+  assert.equal(a.width, 1516);
+  assert.equal(a.confidence, 0.91);
+  assert.deepEqual(a.mask, { rows: 122, cols: 376, encoding: 'lossless' });
+  assert.equal(b.id, 2);
+  assert.equal(b.mask?.encoding, 'one_bit');
+  assert.deepEqual(parseSamOutput(''), []);
+  assert.throws(() => parseSamOutput('<0f>0<|box;x1=a;y1=1;x2=2;y2=3;w=4;h=5|>'));
+});
+
+test('SAM finds the far screen: largest match wins, key comes only from MODEL_API_KEY', async () => {
+  assert.equal(samFromEnv({ BASETEN_API_KEY: 'b', NVIDIA_API_KEY: 'n' }), null);
+  const sse = [
+    { type: 'response.output_text.delta', delta: '<0f>0<|box;x1=5;y1=5;x2=40;y2=30;w=1280;h=720|>,' },
+    { type: 'response.output_text.delta', delta: '1<|box;x1=400;y1=100;x2=900;y2=500;w=1280;h=720|>' },
+    { type: 'response.completed' },
+  ].map((e) => `data: ${JSON.stringify(e)}
+
+`).join('');
+  const calls: Record<string, any>[] = [];
+  const fetch = (async (_url: string, init: RequestInit) => {
+    calls.push(JSON.parse(String(init.body)));
+    return new Response(sse, { status: 200 });
+  }) as unknown as typeof globalThis.fetch;
+  const cfg = { ...samFromEnv({ MODEL_API_KEY: 'k' })!, fetch };
+  const r = await samFindScreen(cfg, 'data:image/jpeg;base64,AAAA');
+  assert.equal(r.matches, 2);
+  assert.deepEqual(r.match?.box, { x1: 400, y1: 100, x2: 900, y2: 500 });
+  assert.equal(r.trace.ok, true);
+  assert.equal(calls[0].model, 'sam-3.1');
+  assert.deepEqual(calls[0].metadata, { include_confidence: 'true', mask_encoding: 'one_bit' });
+
+  const down = (async () => new Response('billing hold', { status: 402 })) as unknown as typeof globalThis.fetch;
+  const failed = await samFindScreen({ ...cfg, fetch: down }, 'data:,');
+  assert.equal(failed.match, null);
+  assert.equal(failed.trace.note, 'HTTP 402');
 });
 
 test('demo samples: the packed PS-07 order holds, its tampered copy is rejected offline', async () => {

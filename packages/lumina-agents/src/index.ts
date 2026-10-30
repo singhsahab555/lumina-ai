@@ -24,5 +24,6 @@ export {
   type TraceEvent,
 } from './models/types.ts';
 export { MetaChatModel, packerFromEnv, BASETEN_SPARK_MODEL, samSegmentRequest, samSegmentRaw, META_BASE_URL, SPARK_MODEL, SAM_MODEL, type MetaConfig } from './models/meta.ts';
+export { parseSamOutput, samFindScreen, samFromEnv, type SamBox, type SamMatch, type ScreenFind } from './models/sam.ts';
 export { OllamaChatModel, OLLAMA_URL, VERIFIER_MODEL, type OllamaConfig } from './models/ollama.ts';
 export { sha256Hex } from './util.ts';

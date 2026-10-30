@@ -2,6 +2,19 @@
 
 Measured numbers per day. Newest first.
 
+## Day 7: return channel (Mode 3) and SAM 3.1 screen finder (Fri Oct 30, built early)
+
+- **Signed ack over light.** Once a file arrives byte-exact, the plant screen offers "Beam signed ack back". The `lumina.ack/v1` JSON names the file's SHA-256, the plant's decision (the gate's APPROVE/HOLD/REJECT with finding codes, or RECEIVED for a non-order file), who decided, and receive telemetry (seconds, frames, CRC-valid frames, droplets, K). It goes back through the same deflate → LT → grid path, in Auto mode, at 5/10/20 sym/s. An ack is ~650 B, a block or two after deflate, so it crosses in well under a second at 10 sym/s.
+- **Signature:** ECDSA P-256 over the body's JSON, via WebCrypto. The key is generated on the plant device and kept non-extractable in IndexedDB, so the private half never leaves it. The plant screen shows a 16-hex fingerprint.
+- **Laptop side:** the Receive tab recognises an ack and checks three things: the signature, a **pinned** plant key (trust on first use: the operator compares the fingerprint with the plant screen once), and that the ack names the hash the Transmit tab **last beamed**. It shows "Plant says REJECT" only when all three pass. Tests: a sender flipping REJECT → APPROVE fails the signature; a second device's own valid ack shows a different fingerprint; splicing the real key onto it fails.
+- **SAM 3.1 (connected side):** `models/sam.ts` parses the output grammar from dev.meta.ai/docs/sam/reading-segmentation: `<Nf>` frame marker, records `id<|box;x1;y1;x2;y2;w;h[;c]|><|mask;…data=H,W,~|!…|>`, source-pixel boxes, sparse ids, and an empty answer meaning no match. Masks stay undecoded because only the box is used. `/api/sam` on the sender's helper sends one 1280 px JPEG still with "computer monitor". The largest box, padded 12%, becomes the region of interest. The receiver then decodes **only that region at native camera resolution** instead of the whole frame downscaled to 1280 px. After 45 frames without a lock it asks SAM again (at most every 3 s).
+- **Measured (Node, synthetic 1080p webcam, far screen ~3.4 px/module):** whole frame downscaled: 3/6 frames read. SAM region: **6/6**.
+- **SAM is not live yet:** it is served only by the Meta Model API, and that key is still blocked by the billing hold. Open SAM 2/SAM 3 weights are not on the hackathon's model list, and this laptop has ~1.2 GB free RAM anyway, so there is no local or Modal stand-in. Without `MODEL_API_KEY` the panel says so and the receiver reads the whole frame (Day 3 behaviour). Tests use a scripted SSE reply.
+- **Cut, per the cut order:** ECDH + AES-GCM over light. The ack is signed, not encrypted.
+- Browser e2e unchanged after the crop refactor: 2-color 5.1 KB/s, 8-color 15.4 KB/s, Auto 12.2 KB/s, all byte-exact. The e2e now also clicks "Beam signed ack back" (`docs/media/day7-ack-beaming.png`).
+- Tests: agents 23/23 (SAM grammar, client, no-key path, HTTP 402), protocol 28/28, web 10/10 (ack sign/verify/forgery, ack round trip through the colour camera path, SAM region vs whole frame).
+- Still to do on real hardware: the laptop webcam reading the tablet's ack screen, and the first live SAM call once the Meta key clears.
+
 ## Day 6: Spark on Baseten, plant-side policy gate, tampered order rejected (Fri Oct 30)
 
 - **Packer now runs on Muse Spark Open on Baseten** (`meta-models/muse-spark-open`). The host is picked by key: Meta API, then Baseten, then NVIDIA NIM. Baseten lists the model without the `-1026` suffix and supports JSON mode but not strict `json_schema`, so the adapter sends `response_format: json_object` there, and the prompt now carries a filled example bundle.

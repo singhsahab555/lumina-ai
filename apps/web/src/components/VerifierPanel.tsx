@@ -3,6 +3,7 @@ import { validateBundle, verifyBundle, type SitePolicy, type TraceEvent, type Ve
 import { sha256, toHex } from '@lumina/protocol';
 import sitePolicy from '../../../../packages/lumina-agents/fixtures/site-policy.json';
 import { formatDuration } from './Stat.tsx';
+import type { PlantDecision } from './AckBeam.tsx';
 
 // Plant-side check of a received work-order bundle.
 //  1. The deterministic policy gate runs right here, offline, on any device:
@@ -55,7 +56,16 @@ const DECISION_TEXT = {
   reject: 'REJECTED: do not apply',
 } as const;
 
-export function VerifierPanel({ bundle, fileName }: { bundle: WorkOrderBundle; fileName: string }) {
+export function VerifierPanel({
+  bundle,
+  fileName,
+  onDecision,
+}: {
+  bundle: WorkOrderBundle;
+  fileName: string;
+  /** The current decision, for the signed ack the plant beams back. */
+  onDecision?: (d: PlantDecision) => void;
+}) {
   const [gate, setGate] = useState<Verdict | null>(null);
   const [model, setModel] = useState<Model>({ kind: 'probing' });
   const [run, setRun] = useState<Run>({ kind: 'idle' });
@@ -133,6 +143,11 @@ export function VerifierPanel({ bundle, fileName }: { bundle: WorkOrderBundle; f
   }
   const header = verdict?.findings.filter((f) => !f.path.startsWith('$.steps')) ?? [];
   const modelName = model.kind === 'live' ? model.model : model.kind === 'recorded' ? model.rec.verdict.trace[0]?.model ?? 'model' : '';
+  const decidedBy = done ? `policy gate + ${modelName}${done.live ? '' : ' (recorded run)'}` : 'deterministic policy gate, on this device, offline';
+
+  useEffect(() => {
+    if (verdict) onDecision?.({ verdict, decidedBy, workOrderId: bundle.work_order_id });
+  }, [verdict, decidedBy, bundle, onDecision]);
 
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-zinc-800 p-3 text-sm" data-testid="verifier">
@@ -145,7 +160,7 @@ export function VerifierPanel({ bundle, fileName }: { bundle: WorkOrderBundle; f
         <div className={`rounded-lg px-3 py-2 font-medium ${DECISION_STYLE[verdict.decision]}`} data-testid="verdict">
           {DECISION_TEXT[verdict.decision]}
           <div className="text-[11px] font-normal opacity-80">
-            {done ? `policy gate + ${modelName}${done.live ? '' : ' (recorded run)'}` : 'deterministic policy gate, on this device, offline'}
+            {decidedBy}
           </div>
         </div>
       )}

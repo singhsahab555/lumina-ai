@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import { packApi } from './server/pack-api.ts';
 import { verifyApi } from './server/verify-api.ts';
+import { samApi } from './server/sam-api.ts';
 
 // `--mode lan` serves over self-signed HTTPS on the LAN: phones only grant
 // camera access to secure origins.
@@ -20,6 +21,8 @@ export default defineConfig(({ mode }) => ({
     packApi(),
     // Plant-side verifier endpoint (Ollama on the plant network; dev/preview only).
     verifyApi(),
+    // SAM 3.1 screen finder for the return-channel camera (Meta Model API; dev/preview only).
+    samApi(),
     react(),
     tailwindcss(),
     VitePWA({

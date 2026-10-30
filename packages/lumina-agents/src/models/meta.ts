@@ -152,12 +152,13 @@ export class MetaChatModel implements ChatModel {
 
 // SAM 3.1 goes through the Responses API: a text prompt plus an image, and
 // the reply is special-token text with one box and one mask per match. The
-// output grammar is on dev.meta.ai "reading segmentation output"; the parser
-// lands on Day 7 together with the return channel.
-export function samSegmentRequest(prompt: string, imageUrl: string): Record<string, unknown> {
+// output grammar is on dev.meta.ai "reading segmentation output"; sam.ts parses it.
+// `metadata` values are strings: include_confidence 'true', mask_encoding 'one_bit'.
+export function samSegmentRequest(prompt: string, imageUrl: string, metadata?: Record<string, string>): Record<string, unknown> {
   return {
     model: SAM_MODEL,
     stream: true,
+    ...(metadata && { metadata }),
     input: [
       {
         type: 'message',
@@ -172,12 +173,12 @@ export function samSegmentRequest(prompt: string, imageUrl: string): Record<stri
 }
 
 /** Collects the streamed output text of a SAM 3.1 call (raw special-token text). */
-export async function samSegmentRaw(cfg: MetaConfig, prompt: string, imageUrl: string): Promise<string> {
+export async function samSegmentRaw(cfg: MetaConfig, prompt: string, imageUrl: string, metadata?: Record<string, string>): Promise<string> {
   const doFetch = cfg.fetch ?? globalThis.fetch.bind(globalThis);
   const res = await doFetch(`${cfg.baseUrl ?? META_BASE_URL}/responses`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${cfg.apiKey}`, 'Content-Type': 'application/json', Accept: 'text/event-stream' },
-    body: JSON.stringify(samSegmentRequest(prompt, imageUrl)),
+    body: JSON.stringify({ ...samSegmentRequest(prompt, imageUrl, metadata), ...(cfg.model && { model: cfg.model }) }),
   });
   if (!res.ok) throw new ModelHttpError(res.status, await res.text());
   let out = '';
@@ -186,6 +187,7 @@ export async function samSegmentRaw(cfg: MetaConfig, prompt: string, imageUrl: s
     const data = line.slice(5).trim();
     if (data === '[DONE]') break;
     const event = JSON.parse(data) as { type?: string; delta?: string };
+    if (event.type === 'response.completed') break;
     if (event.type === 'response.output_text.delta' && event.delta) out += event.delta;
   }
   return out;

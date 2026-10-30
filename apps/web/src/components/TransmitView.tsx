@@ -6,6 +6,7 @@ import { Stat, formatBytes, formatDuration } from './Stat.tsx';
 import { deflateRaw } from '../lib/deflate.ts';
 import { Transmitter, dropletsPerSymbol, randomSessionId, type TxMode } from '../lib/transmitter.ts';
 import { startScheduler, type SchedulerStats } from '../lib/scheduler.ts';
+import { rememberBeam } from '../lib/ack.ts';
 
 const sampleUrl = (name: string) => `${import.meta.env.BASE_URL}samples/${name}`;
 
@@ -68,7 +69,10 @@ export function TransmitView() {
         const compressed = await deflateRaw(sealEnvelope(name, bytes));
         const sessionId = randomSessionId();
         tx.current = new Transmitter(compressed, sessionId, modeRef.current);
-        setPayload({ name, originalBytes: bytes.length, compressedBytes: compressed.length, sessionId, sha256: toHex(sha256(bytes)) });
+        const hash = toHex(sha256(bytes));
+        setPayload({ name, originalBytes: bytes.length, compressedBytes: compressed.length, sessionId, sha256: hash });
+        // The plant's signed ack names this hash; the Receive tab matches them.
+        rememberBeam({ name, sha256: hash, at: new Date().toISOString() });
         emit();
         setSeed(seedRef.current);
       } catch (e) {
@@ -207,6 +211,9 @@ export function TransmitView() {
             <div className="col-span-2">
               <Stat label="SHA-256" value={`${payload.sha256.slice(0, 16)}…`} testId="tx-sha" />
             </div>
+            <a href="#rx" className="col-span-2 rounded-lg bg-zinc-800 px-3 py-2 text-center text-xs hover:bg-zinc-700" data-testid="await-ack">
+              Return channel: receive the plant's signed ack →
+            </a>
           </div>
         )}
       </aside>

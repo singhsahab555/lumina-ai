@@ -122,6 +122,12 @@ async function run(mode, video, server) {
     const same = Buffer.compare(got, original) === 0 && download.suggestedFilename() === NAME;
     const kbps = original.length / 1024 / elapsed;
     console.log(`[${mode}] verified byte-exact ${same} in ${elapsed.toFixed(1)} s over light → ${kbps.toFixed(1)} KB/s (droplets/frame ${dpf}, colors seen ${colors})`);
+
+    // Return channel: the receiver signs an ack and beams it on its own screen.
+    await page.getByTestId('ack-beam').click();
+    await page.getByTestId('ack-beaming').waitFor({ timeout: 10000 });
+    console.log(`[${mode}] ack beaming, plant key ${await page.getByTestId('ack-key').innerText()}`);
+    if (mode === 8) await page.screenshot({ path: `${media}day7-ack-beaming.png` });
     return { same, kbps };
   } finally {
     await browser.close();

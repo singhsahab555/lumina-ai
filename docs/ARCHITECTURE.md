@@ -51,7 +51,7 @@ Zero-dep TypeScript, runs in Node and the browser. Everything is built around on
 | Site policy | `policy.ts`, `fixtures/site-policy.json` | Asset allow-list, per-parameter unit and range limits, and an injection-phrase scan. These checks are deterministic and **final**. |
 | Spark packer | `packer.ts` | Calls chat completions on the Meta API (strict `json_schema`), Baseten Spark Open or NVIDIA NIM (JSON mode, schema example in the prompt) and retries with the validation errors (up to 3). Provenance (source title, bytes and SHA-256) is set by software, never by the model. |
 | Verifier agent | `verifier.ts` | Ollama `/api/chat` agent loop with tools `check_asset`, `check_setpoint` and `scan_text`. The bundle is treated as untrusted data. **The model can add reasons to reject but can never approve what policy blocks** (`modelOverruled`). It fails closed: no model → `hold`. |
-| SAM 3.1 | `models/meta.ts` | Request builder for the `POST /v1/responses` stream (text prompt + image). The output parser comes on Day 7. |
+| SAM 3.1 | `models/meta.ts`, `models/sam.ts` | Request for the `POST /v1/responses` stream (text prompt + image), the output-grammar parser, and `samFindScreen`. Served to the browser by `apps/web/server/sam-api.ts`. |
 | Trace | `models/types.ts` | Each call records model, op, ms, bytes in and out, and ok. This feeds the UI's model-trace panel. |
 
 CLI: `cd packages/lumina-agents && npm run cli -- status | pack <doc> | verify <bundle>` (config in the root `.env`, see `.env.example`).
