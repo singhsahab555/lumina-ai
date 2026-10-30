@@ -1,7 +1,10 @@
 {
+  "schema": "lumina.work-order/v1",
+  "kind": "neural-summary",
   "work_order_id": "WO-2026-1027",
+  "site": "North Basin WTP",
   "asset_id": "P-07B",
-  "summary": "P-07B drive-end vibration rose to 7.9 mm/s RMS on 2026-10-20 and the pump was placed in standby with LOTO tag #4471 applied. Inspection on 2026-10-21 found coupling misalignment 0.32 mm and discoloured grease; laser alignment was completed on 2026-10-22 and bearings were regreased, with a 30 min test run on 2026-10-23 showing 2.4 mm/s vibration. The work order restores P-07B to service with adjusted VFD ramp and confirmed protection setpoints.",
+  "summary": "P-07B vibration rose to 7.9 mm/s exceeding the 7.1 mm/s alarm and was taken out of service with LOTO tag #4471 applied and duty switched to P-07A. Inspection found coupling misalignment 0.32 mm (tolerance 0.05 mm) and discoloured grease; laser alignment to 0.03 mm offset and bearing regrease with 18 g per bearing were completed and a 30 min test run at 80% speed showed 2.4 mm/s vibration and 52 C bearing temperature. Work order restores P-07B to duty/standby rotation with updated VFD ramp and protection setpoints and requires 24 h vibration trend logging.",
   "steps": [
     {
       "order": 1,
@@ -59,8 +62,5 @@
     "title": "ps07-shift-log-45d.txt",
     "bytes": 56190,
     "sha256": "7509e094a74cfccb62fa5ed8580a9475b2034375e7a5c05e6e3bf78921f58d27"
-  },
-  "schema": "lumina.work-order/v1",
-  "kind": "neural-summary",
-  "site": "North Basin WTP"
+  }
 }

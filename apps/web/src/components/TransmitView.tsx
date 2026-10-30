@@ -121,6 +121,14 @@ export function TransmitView() {
         >
           Load sample work order
         </button>
+        <button
+          className="rounded-lg border border-red-900 px-3 py-2 text-sm text-red-300 hover:bg-red-950"
+          onClick={() => void loadSample('ps07-work-order-tampered.json')}
+          data-testid="sample-tampered"
+          title="The packed PS-07 order, altered by a compromised sender: discharge limit 9 bar and an injected interlock bypass"
+        >
+          Load tampered work order (attack demo)
+        </button>
         <PackerPanel onBeam={(name, bytes) => void load(name, bytes)} />
 
         <div className="rounded-xl bg-zinc-900 p-3">

@@ -23,6 +23,6 @@ export {
   type ToolSpec,
   type TraceEvent,
 } from './models/types.ts';
-export { MetaChatModel, packerFromEnv, samSegmentRequest, samSegmentRaw, META_BASE_URL, SPARK_MODEL, SAM_MODEL, type MetaConfig } from './models/meta.ts';
-export { OllamaChatModel, OLLAMA_URL, GLIMMER_MODEL, type OllamaConfig } from './models/ollama.ts';
+export { MetaChatModel, packerFromEnv, BASETEN_SPARK_MODEL, samSegmentRequest, samSegmentRaw, META_BASE_URL, SPARK_MODEL, SAM_MODEL, type MetaConfig } from './models/meta.ts';
+export { OllamaChatModel, OLLAMA_URL, VERIFIER_MODEL, type OllamaConfig } from './models/ollama.ts';
 export { sha256Hex } from './util.ts';

@@ -16,7 +16,12 @@ Rules:
 - One step per action, in the document's order. Keep instructions short and imperative.
 - When a step changes a value, fill setpoint using one of: ${PARAMETER_KEYS.join(', ')}. Otherwise setpoint is null.
 - summary: at most 3 sentences on what happened and why the work is needed.
-- Leave source as {"title":"","bytes":0,"sha256":""}; it is filled in by software.`;
+- Leave source as {"title":"","bytes":0,"sha256":""}; it is filled in by software.
+Reply with one JSON object of exactly this shape (example values; every key is required):
+{"schema":"${BUNDLE_SCHEMA_ID}","kind":"neural-summary","work_order_id":"WO-2026-0001","site":"Example Site","asset_id":"P-01A",
+"summary":"...","steps":[{"order":1,"instruction":"Isolate P-01A.","setpoint":null},
+{"order":2,"instruction":"Set vibration alarm to 6.0 mm/s.","setpoint":{"parameter":"vibration_alarm","value":6.0,"unit":"mm/s"}}],
+"source":{"title":"","bytes":0,"sha256":""}}`;
 
 export interface PackResult {
   bundle: WorkOrderBundle;

@@ -1,5 +1,6 @@
-// Air-gapped side: Muse Glimmer (local, via Ollama) verifies a received bundle
-// against the local site policy before anything is shown as actionable.
+// Air-gapped side: a plant-network model (Llama 3.1 8B on Ollama) verifies a
+// received bundle against the local site policy before anything is shown as
+// actionable. The deterministic gate alone runs anywhere, even on the phone.
 //
 // Trust model:
 //  - The bundle is untrusted data. Its text is never treated as instructions.
@@ -90,7 +91,7 @@ export async function verifyBundle(
   bundle: WorkOrderBundle,
   policy: SitePolicy,
   model: ChatModel | null,
-  opts: { maxTurns?: number } = {},
+  opts: { maxTurns?: number; onTrace?: (event: TraceEvent) => void } = {},
 ): Promise<Verdict> {
   const findings = runPolicyChecks(bundle, policy);
   const blocked = findings.some((f) => f.severity === 'block');
@@ -108,7 +109,9 @@ export async function verifyBundle(
   ];
   try {
     for (let turn = 0; turn < (opts.maxTurns ?? 8); turn++) {
-      const res = await tracedChat(model, `verify#${turn + 1}`, { messages, tools: VERIFIER_TOOLS, temperature: 0 }, verdict.trace);
+      const res = await tracedChat(model, `verify#${turn + 1}`, { messages, tools: VERIFIER_TOOLS, temperature: 0 }, verdict.trace).finally(() =>
+        opts.onTrace?.(verdict.trace[verdict.trace.length - 1]),
+      );
       if (res.toolCalls.length === 0) {
         verdict.model = parseModelVerdict(res.content);
         if (!verdict.model) verdict.notes.push('model reply was not a valid verdict');

@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import { packApi } from './server/pack-api.ts';
+import { verifyApi } from './server/verify-api.ts';
 
 // `--mode lan` serves over self-signed HTTPS on the LAN: phones only grant
 // camera access to secure origins.
@@ -17,6 +18,8 @@ export default defineConfig(({ mode }) => ({
     mode === 'lan' && basicSsl(),
     // Local Meta AI packer endpoint (dev/preview only; the Pages build is static).
     packApi(),
+    // Plant-side verifier endpoint (Ollama on the plant network; dev/preview only).
+    verifyApi(),
     react(),
     tailwindcss(),
     VitePWA({

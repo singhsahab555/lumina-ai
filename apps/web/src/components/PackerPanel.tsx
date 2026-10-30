@@ -120,7 +120,7 @@ export function PackerPanel({ onBeam }: { onBeam: (name: string, bytes: Uint8Arr
 
       {status.kind === 'running' && (
         <p className="mt-2 text-xs text-zinc-400">
-          {status.model} · {live ? `working ${formatDuration((now - status.startedAt) / 1000)} (a pass takes minutes)` : 'replaying'}
+          {status.model} · {live ? `working ${formatDuration((now - status.startedAt) / 1000)}` : 'replaying'}
         </p>
       )}
 

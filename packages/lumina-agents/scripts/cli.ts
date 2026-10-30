@@ -1,17 +1,20 @@
 // Smoke-test the Meta model integration from a terminal.
 //
 //   npm run cli -- status
-//   npm run cli -- pack   <document.txt> [out.json]      Muse Spark (MODEL_API_KEY), else Muse Glimmer 30B on NVIDIA NIM (NVIDIA_API_KEY)
-//   npm run cli -- verify <bundle.json>  [policy.json]    Muse Glimmer via Ollama (offline)
+//   npm run cli -- pack   <document.txt> [out.json]      Muse Spark (MODEL_API_KEY, else BASETEN_API_KEY), else Muse Glimmer 30B on NVIDIA NIM
+//   npm run cli -- verify <bundle.json>  [policy.json] [--record run.json]
+//                                                        plant verifier via Ollama (OLLAMA_URL, VERIFIER_MODEL); --record saves the run for replay
 //
 // Config comes from the repo-root .env (see .env.example).
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { basename } from 'node:path';
 import {
+  BASETEN_SPARK_MODEL,
   OllamaChatModel,
   packWorkOrder,
   packerFromEnv,
+  sha256Hex,
   validateBundle,
   verifyBundle,
   type SitePolicy,
@@ -23,10 +26,10 @@ const DEFAULT_POLICY = new URL('../fixtures/site-policy.json', import.meta.url);
 
 const packer = () => {
   const model = packerFromEnv(env);
-  if (!model) throw new Error('neither MODEL_API_KEY nor NVIDIA_API_KEY is set (copy .env.example to .env)');
+  if (!model) throw new Error('none of MODEL_API_KEY, BASETEN_API_KEY, NVIDIA_API_KEY is set (copy .env.example to .env)');
   return model;
 };
-const glimmer = () => new OllamaChatModel({ baseUrl: env.OLLAMA_URL, model: env.GLIMMER_MODEL });
+const verifier = () => new OllamaChatModel({ baseUrl: env.OLLAMA_URL, model: env.VERIFIER_MODEL });
 
 function printTrace(trace: TraceEvent[]): void {
   for (const t of trace) {
@@ -35,11 +38,16 @@ function printTrace(trace: TraceEvent[]): void {
 }
 
 async function main(): Promise<void> {
-  const [cmd, a, b] = process.argv.slice(2);
+  const args = process.argv.slice(2);
+  const flag = args.indexOf('--record');
+  const record = flag >= 0 ? args.splice(flag, 2)[1] : undefined;
+  const [cmd, a, b] = args;
   if (cmd === 'status') {
     console.log(`Meta Model API key: ${env.MODEL_API_KEY ? 'set' : 'missing'}  (${env.SPARK_MODEL ?? 'muse-spark-1.3'})`);
+    console.log(`Baseten key: ${env.BASETEN_API_KEY ? 'set' : 'missing'}  (${env.BASETEN_MODEL ?? BASETEN_SPARK_MODEL})`);
     console.log(`NVIDIA NIM key: ${env.NVIDIA_API_KEY ? 'set' : 'missing'}  (${env.NVIDIA_MODEL ?? 'meta/muse-glimmer-30b'})`);
-    const g = glimmer();
+    const g = verifier();
+    console.log(`Packer in use: ${packerFromEnv(env)?.id ?? 'none'}`);
     console.log(`Ollama ${g.id}: ${(await g.available()) ? 'ready' : 'not available (ollama serve + ollama pull)'}`);
   } else if (cmd === 'pack' && a) {
     // The sender packs for a known site; default to the demo receiver's policy site.
@@ -57,15 +65,20 @@ async function main(): Promise<void> {
     const parsed = validateBundle(JSON.parse(readFileSync(a, 'utf8')));
     if (!parsed.ok) throw new Error(`invalid bundle:\n  ${parsed.errors.join('\n  ')}`);
     const policy = JSON.parse(readFileSync(b ?? DEFAULT_POLICY, 'utf8')) as SitePolicy;
-    const g = glimmer();
+    const g = verifier();
     const v = await verifyBundle(parsed.bundle, policy, (await g.available()) ? g : null);
+    if (record) {
+      // The web receiver replays this where no plant helper is reachable, but only for this exact bundle.
+      const bundleSha256 = await sha256Hex(new TextEncoder().encode(JSON.stringify(parsed.bundle)));
+      writeFileSync(record, JSON.stringify({ date: new Date().toISOString(), bundleSha256, verdict: v }, null, 2) + '\n');
+    }
     printTrace(v.trace);
     console.log(`DECISION: ${v.decision.toUpperCase()}${v.modelOverruled ? '  (model approved, policy overruled)' : ''}`);
     for (const f of v.findings) console.log(`  [${f.severity}] ${f.code} ${f.path}: ${f.message}`);
     for (const r of v.model?.reasons ?? []) console.log(`  model: ${r}`);
     for (const n of v.notes) console.log(`  note: ${n}`);
   } else {
-    console.log('usage: cli status | pack <doc> [out.json] | verify <bundle.json> [policy.json]');
+    console.log('usage: cli status | pack <doc> [out.json] | verify <bundle.json> [policy.json] [--record run.json]');
     process.exitCode = 2;
   }
 }

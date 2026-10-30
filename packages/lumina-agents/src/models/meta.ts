@@ -9,14 +9,27 @@ export const SPARK_MODEL = 'muse-spark-1.3';
 export const SAM_MODEL = 'sam-3.1';
 export const NVIDIA_BASE_URL = 'https://integrate.api.nvidia.com/v1';
 export const NVIDIA_GLIMMER_MODEL = 'meta/muse-glimmer-30b';
+export const BASETEN_BASE_URL = 'https://inference.baseten.co/v1';
+export const BASETEN_SPARK_MODEL = 'meta-models/muse-spark-open';
 
 /**
- * Packer model for the connected sender: Muse Spark on the Meta Model API when
- * there is a key, else Meta's open-weight Muse Glimmer 30B on NVIDIA NIM (same
- * wire format, streamed). Null when neither key is set.
+ * Packer model for the connected sender, first key wins: Muse Spark on the Meta
+ * Model API, Muse Spark Open on Baseten, then Meta's open-weight Muse Glimmer 30B
+ * on NVIDIA NIM. All speak the same wire format. Null when no key is set.
  */
 export function packerFromEnv(env: Record<string, string | undefined>): MetaChatModel | null {
   if (env.MODEL_API_KEY) return new MetaChatModel({ apiKey: env.MODEL_API_KEY, baseUrl: env.META_BASE_URL, model: env.SPARK_MODEL });
+  if (env.BASETEN_API_KEY) {
+    // Baseten has JSON mode but not strict json_schema; validateBundle() re-checks anyway.
+    return new MetaChatModel({
+      apiKey: env.BASETEN_API_KEY,
+      baseUrl: env.BASETEN_BASE_URL || BASETEN_BASE_URL,
+      model: env.BASETEN_MODEL || BASETEN_SPARK_MODEL,
+      provider: 'baseten',
+      stream: true,
+      jsonMode: 'object',
+    });
+  }
   if (env.NVIDIA_API_KEY) {
     return new MetaChatModel({
       apiKey: env.NVIDIA_API_KEY,
@@ -37,6 +50,8 @@ export interface MetaConfig {
   provider?: string;
   /** Stream the reply (SSE). NVIDIA NIM's gateway 504s on long non-streamed reasoning replies. */
   stream?: boolean;
+  /** 'schema' sends the strict json_schema; 'object' asks only for a JSON object, for providers without strict mode. */
+  jsonMode?: 'schema' | 'object';
   fetch?: typeof fetch;
 }
 
@@ -99,6 +114,7 @@ export class MetaChatModel implements ChatModel {
   private readonly baseUrl: string;
   private readonly model: string;
   private readonly stream: boolean;
+  private readonly jsonMode: 'schema' | 'object';
   private readonly doFetch: typeof fetch;
 
   constructor(cfg: MetaConfig) {
@@ -106,6 +122,7 @@ export class MetaChatModel implements ChatModel {
     this.baseUrl = cfg.baseUrl ?? META_BASE_URL;
     this.model = cfg.model ?? SPARK_MODEL;
     this.stream = cfg.stream ?? false;
+    this.jsonMode = cfg.jsonMode ?? 'schema';
     this.doFetch = cfg.fetch ?? globalThis.fetch.bind(globalThis);
     this.id = `${cfg.provider ?? 'meta'}:${this.model}`;
   }
@@ -115,7 +132,10 @@ export class MetaChatModel implements ChatModel {
     if (this.stream) body.stream = true;
     if (req.temperature !== undefined) body.temperature = req.temperature;
     if (req.tools?.length) body.tools = req.tools.map((t) => ({ type: 'function', function: t }));
-    if (req.jsonSchema) body.response_format = { type: 'json_schema', json_schema: { ...req.jsonSchema, strict: true } };
+    if (req.jsonSchema) {
+      body.response_format =
+        this.jsonMode === 'object' ? { type: 'json_object' } : { type: 'json_schema', json_schema: { ...req.jsonSchema, strict: true } };
+    }
 
     const res = await this.doFetch(`${this.baseUrl}/chat/completions`, {
       method: 'POST',

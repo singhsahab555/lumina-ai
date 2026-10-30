@@ -11,7 +11,7 @@ Industrial control systems, lab instruments, energy and manufacturing OT network
 1. **Semantic packing (Muse Spark, connected side).** Distills large manuals, logs, or work orders into a compact, schema-checked JSON bundle before transmission.
 2. **Rateless fountain codes in color matrices.** The sender loops LT-coded frames. The receiver can join at any moment, skip any frames, and still reconstruct the payload.
 3. **Screen lock-on (SAM 3.1, connected side).** Text-prompted video tracking acquires the far screen for the return channel. Classical finder-pattern tracking and homography handle every frame.
-4. **Offline verifier agent (Muse Glimmer, air-gapped side).** A local open-weights model checks every incoming bundle against local policy before anything is applied, and rehydrates it into an actionable view. No network is needed on the isolated side.
+4. **Offline policy gate (air-gapped side).** Every received work order is checked on the device against the local site policy (assets, setpoint limits, injected instructions) before anything is applied. It never calls the network and it fails closed: a tampered order is rejected, a clean one is held until a local verifier model has checked it too. Cloud models run only on the connected sender; [why](META_AI_INTEGRATION.md#where-each-model-runs-and-why).
 
 ## What was built during the hackathon
 
@@ -26,7 +26,7 @@ The hackathon's rules require new work only. Everything in this repo was written
 
 ```
 packages/lumina-protocol   LT fountain codec, frame format, grid, camera-frame reader, file envelope (zero deps)
-packages/lumina-agents     Meta models: Muse Spark packer, Muse Glimmer verifier, SAM 3.1 client
+packages/lumina-agents     Meta models: Muse Spark packer, policy gate + verifier agent, SAM 3.1 client
 apps/web                   React PWA: transmitter (Day 2), receiver (Day 3)
 docs/                      Architecture, 10-day plan, decisions
 ```
@@ -82,9 +82,10 @@ The reverse direction also works without certificates: phone transmits (plain `h
 
 ## Meta models used
 
-- **Muse Spark**, via the Meta Model API: semantic packing on the connected side. Until the API account is active, the same packer runs on **Muse Glimmer 30B** (Meta open weights) hosted on NVIDIA NIM. The recorded run in the live app used Glimmer 30B.
+- **Muse Spark Open** on Baseten: semantic packing on the connected side (the recorded run in the live app: 1 attempt, 16 s). **Muse Spark** on the Meta Model API takes over once the API account is active.
+- **Muse Glimmer 30B** (Meta open weights) on NVIDIA NIM, connected side: packer fallback, and a red-team pass on each bundle before it is sent (Day 8)
 - **SAM 3.1**, via the Meta Model API: screen acquisition and tracking on the connected side
-- **Muse Glimmer** (open weights, Apache 2.0, run locally via Ollama): the offline verifier agent on the air-gapped side
+- **Muse Glimmer 30B** on plant hardware (Ollama) is the intended optional verifier behind the policy gate. It is not run in the demo, because the demo hardware can't hold it, and we never move it to the cloud. See [Where each model runs, and why](META_AI_INTEGRATION.md#where-each-model-runs-and-why).
 
 Model weights are never committed to this repo.
 

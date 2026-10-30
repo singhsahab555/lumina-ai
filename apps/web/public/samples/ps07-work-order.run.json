@@ -1,11 +1,16 @@
 {
-  "date": "2026-10-30T08:11:18Z",
+  "date": "2026-10-30T11:27:55.506Z",
   "sourceBytes": 56190,
-  "bundleBytes": 1610,
-  "attempts": 3,
+  "bundleBytes": 1724,
+  "attempts": 1,
   "trace": [
-    { "model": "nvidia:meta/muse-glimmer-30b", "op": "pack#1", "ms": 272219, "inputBytes": 57891, "outputBytes": 1297, "ok": true, "note": "invalid: $.work_order_id: required; $.work_order_id: expected non-empty string; $.steps[0].order: required" },
-    { "model": "nvidia:meta/muse-glimmer-30b", "op": "pack#2", "ms": 132959, "inputBytes": 60819, "outputBytes": 1570, "ok": true, "note": "invalid: $.steps[1].setpoint.parameter: required; $.steps[1].setpoint.value: required; $.steps[1].setpoint.unit: required" },
-    { "model": "nvidia:meta/muse-glimmer-30b", "op": "pack#3", "ms": 245666, "inputBytes": 63679, "outputBytes": 1875, "ok": true }
+    {
+      "model": "baseten:meta-models/muse-spark-open",
+      "op": "pack#1",
+      "ms": 15930,
+      "inputBytes": 58442,
+      "outputBytes": 1638,
+      "ok": true
+    }
   ]
 }

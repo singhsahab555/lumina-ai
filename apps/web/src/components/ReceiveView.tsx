@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Point } from '@lumina/protocol';
 import type { ReceivedFile, RxStats } from '../lib/receiver.ts';
 import type { RxRequest, RxResponse } from '../lib/receiver.worker.ts';
 import { Stat, formatBytes, formatDuration } from './Stat.tsx';
+import { VerifierPanel, parseBundle } from './VerifierPanel.tsx';
 
 // Frames are downscaled to this long side before decoding: plenty for the
 // ≥4 px/module the detector needs, and it keeps decode time near 30 ms.
@@ -160,6 +161,8 @@ export function ReceiveView() {
   const dropletRate = elapsed > 1 && stats ? stats.received / elapsed : 0;
   const eta = dropletRate && stats && stats.k ? (stats.k - stats.solved + 2) / dropletRate : null;
   const scanning = phase === 'scanning' || phase === 'starting';
+  // Only a byte-exact file is worth checking: a corrupted bundle never reaches the verifier.
+  const bundle = useMemo(() => (file?.verified ? parseBundle(file.bytes) : null), [file]);
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row">
@@ -285,6 +288,8 @@ export function ReceiveView() {
             )}
           </div>
         )}
+
+        {file && bundle && <VerifierPanel bundle={bundle} fileName={file.name} />}
       </aside>
 
       <section className="flex flex-1 items-start justify-center">

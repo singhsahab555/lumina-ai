@@ -1,6 +1,7 @@
 import { test } from 'node:test';
+import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { MetaChatModel, OllamaChatModel, PackError, packWorkOrder, samSegmentRequest, sha256Hex, verifyBundle } from '../src/index.ts';
+import { BASETEN_SPARK_MODEL, MetaChatModel, OllamaChatModel, PackError, packWorkOrder, packerFromEnv, samSegmentRequest, sha256Hex, verifyBundle } from '../src/index.ts';
 import { ScriptedModel, fakeFetch, policy, sampleLog, say, tamperedBundle, validBundle } from './helpers.ts';
 
 const call = (name: string, args: Record<string, unknown>, id = name) => ({ id, name, arguments: args });
@@ -128,7 +129,7 @@ test('streamed replies (NVIDIA NIM) drop reasoning and join content and tool-cal
   assert.deepEqual(res.toolCalls, [{ id: 'c1', name: 'scan_text', arguments: { text: 'hi' } }]);
 });
 
-test('Ollama adapter targets local Glimmer and round-trips tool messages', async () => {
+test('Ollama adapter targets the plant verifier model and round-trips tool messages', async () => {
   const { fn, calls } = fakeFetch({ message: { content: '', tool_calls: [{ function: { name: 'check_asset', arguments: { asset_id: 'P-07B' } } }] } });
   const glimmer = new OllamaChatModel({ fetch: fn });
   const res = await glimmer.chat({
@@ -140,14 +141,47 @@ test('Ollama adapter targets local Glimmer and round-trips tool messages', async
   });
 
   assert.equal(calls[0].url, 'http://localhost:11434/api/chat');
-  assert.equal(calls[0].body.model, 'muse-glimmer');
+  assert.equal(calls[0].body.model, 'llama3.1:8b');
   assert.equal(calls[0].body.stream, false);
   assert.deepEqual((calls[0].body.messages as unknown[])[1], { role: 'tool', content: '[]', tool_name: 'scan_text' });
   assert.equal(res.toolCalls[0].name, 'check_asset');
+});
+
+test('packerFromEnv prefers Meta, then Baseten Spark (JSON mode), then NVIDIA NIM', async () => {
+  assert.equal(packerFromEnv({}), null);
+  assert.equal(packerFromEnv({ MODEL_API_KEY: 'm', BASETEN_API_KEY: 'b', NVIDIA_API_KEY: 'n' })?.id, 'meta:muse-spark-1.3');
+  assert.equal(packerFromEnv({ NVIDIA_API_KEY: 'n' })?.id, 'nvidia:meta/muse-glimmer-30b');
+  const baseten = packerFromEnv({ BASETEN_API_KEY: 'b', NVIDIA_API_KEY: 'n' });
+  assert.equal(baseten?.id, `baseten:${BASETEN_SPARK_MODEL}`);
+
+  // Baseten has no strict json_schema: the request asks for a JSON object instead.
+  const { fn, calls } = fakeFetch({ choices: [{ message: { content: '{}' } }] });
+  const spark = new MetaChatModel({ apiKey: 'b', baseUrl: 'https://inference.baseten.co/v1', jsonMode: 'object', fetch: fn });
+  await spark.chat({ messages: [{ role: 'user', content: 'x' }], jsonSchema: { name: 'B', schema: { type: 'object' } } });
+  assert.equal(calls[0].url, 'https://inference.baseten.co/v1/chat/completions');
+  assert.deepEqual(calls[0].body.response_format, { type: 'json_object' });
+});
+
+test('verifier reports each model call as it happens', async () => {
+  const model = new ScriptedModel([
+    () => ({ content: '', toolCalls: [call('check_asset', { asset_id: 'P-07B' })] }),
+    say('{"decision":"approve","reasons":[],"injection_suspected":false}'),
+  ]);
+  const seen: string[] = [];
+  await verifyBundle(validBundle(), policy(), model, { onTrace: (e) => seen.push(`${e.op} ${e.note ?? ''}`.trim()) });
+  assert.deepEqual(seen, ['verify#1 tools: check_asset', 'verify#2']);
 });
 
 test('SAM 3.1 request follows the Responses API shape', () => {
   const req = samSegmentRequest('computer monitor', 'data:image/jpeg;base64,AAAA') as any;
   assert.equal(req.model, 'sam-3.1');
   assert.deepEqual(req.input[0].content.map((c: { type: string }) => c.type), ['input_text', 'input_image']);
+});
+
+test('demo samples: the packed PS-07 order holds, its tampered copy is rejected offline', async () => {
+  const sample = (name: string) => JSON.parse(readFileSync(new URL(`../../../apps/web/public/samples/${name}`, import.meta.url), 'utf8'));
+  assert.equal((await verifyBundle(sample('ps07-work-order.json'), policy(), null)).decision, 'hold');
+  const v = await verifyBundle(sample('ps07-work-order-tampered.json'), policy(), null);
+  assert.equal(v.decision, 'reject');
+  assert.deepEqual(v.findings.map((f) => `${f.path} ${f.code}`), ['$.steps[4].setpoint out_of_range', '$.steps[5].instruction injection_suspected']);
 });

@@ -1,10 +1,10 @@
-// Muse Glimmer via a local Ollama server: the only model on the air-gapped
-// side. No API key and no network beyond localhost.
+// Plant-side verifier model via Ollama on the plant network (Llama 3.1 8B by
+// default): the only model on the air-gapped side. No API key, no internet.
 
 import { ModelHttpError, type ChatMessage, type ChatModel, type ChatRequest, type ChatResponse } from './types.ts';
 
 export const OLLAMA_URL = 'http://localhost:11434';
-export const GLIMMER_MODEL = 'muse-glimmer';
+export const VERIFIER_MODEL = 'llama3.1:8b';
 
 export interface OllamaConfig {
   baseUrl?: string;
@@ -28,7 +28,7 @@ export class OllamaChatModel implements ChatModel {
 
   constructor(cfg: OllamaConfig = {}) {
     this.baseUrl = cfg.baseUrl ?? OLLAMA_URL;
-    this.model = cfg.model ?? GLIMMER_MODEL;
+    this.model = cfg.model ?? VERIFIER_MODEL;
     this.doFetch = cfg.fetch ?? globalThis.fetch.bind(globalThis);
     this.id = `ollama:${this.model}`;
   }
