@@ -31,6 +31,15 @@ apps/web                   React PWA: transmitter (Day 2), receiver (Day 3)
 docs/                      Architecture, 10-day plan, decisions
 ```
 
+## Try it in 2 minutes (no install)
+
+You need a laptop and a phone. Open **https://singhsahab555.github.io/lumina-ai/** on both.
+
+1. **Laptop, Transmit tab → Meta AI packer → "Replay recorded Meta AI pack".** This replays a real run in which a Meta model distilled a 45-day, 55 KB pump-station shift log into a 1.6 KB schema-checked work order. You'll see each attempt, the validation errors sent back to the model, and the 7 resulting steps. The site is static, so it can't hold a model key; run `npm run dev` locally for a live pack.
+2. **Click "Beam this bundle over light".** The laptop starts flashing an 8-color grid.
+3. **Phone: switch to Receive, turn on airplane mode, tap Start camera,** and point it at the grid. Cover the screen with your hand for a moment if you like; the fountain code doesn't care which frames are missed.
+4. The phone shows **SHA-256 verified, byte-exact**, and lets you download the work order, with no network at any point.
+
 ## Quick start
 
 ```bash
@@ -73,7 +82,7 @@ The reverse direction also works without certificates: phone transmits (plain `h
 
 ## Meta models used
 
-- **Muse Spark**, via the Meta Model API: semantic packing on the connected side
+- **Muse Spark**, via the Meta Model API: semantic packing on the connected side. Until the API account is active, the same packer runs on **Muse Glimmer 30B** (Meta open weights) hosted on NVIDIA NIM. The recorded run in the live app used Glimmer 30B.
 - **SAM 3.1**, via the Meta Model API: screen acquisition and tracking on the connected side
 - **Muse Glimmer** (open weights, Apache 2.0, run locally via Ollama): the offline verifier agent on the air-gapped side
 

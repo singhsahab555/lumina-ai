@@ -39,5 +39,5 @@ Rule: **a working end-to-end demo exists from Day 3 onward.** Every later day ad
 - [ ] **Claim $150 in Meta Model API credits** (form in the guide, needs a card on file, deadline Nov 4). Set a spend limit.
 - [ ] Optional: Baseten $100 (Muse Spark Open, model id `meta-models/muse-spark-open-1026`), Modal $100
 - [ ] Pull Muse Glimmer locally: `ollama pull muse-glimmer` (check that the laptop has enough RAM/VRAM)
-- [ ] Get the judging rubric table (it was missing from the pasted guide) and align the demo to it
+- [x] Get the judging rubric table and align the demo to it (Impact 30, Meta AI 25, Tech 20, Demo 25)
 - [ ] Watch: Agents 102 "Verifiable Agents" (Wed Oct 28, 12 PM ET). It maps directly onto the verifier agent.
