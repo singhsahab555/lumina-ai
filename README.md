@@ -9,9 +9,10 @@
 Industrial control systems, lab instruments, energy and manufacturing OT networks, and robot controllers are deliberately air-gapped. Getting updated context, configs, or work orders into them means sneakernet USB sticks, which bring their own attack surface (BadUSB). A screen and a camera create a one-way, inspectable, physically line-of-sight channel. LuminaAI makes that channel fast, robust, and *verifiable*:
 
 1. **Semantic packing (Muse Spark, connected side).** Distills large manuals, logs, or work orders into a compact, schema-checked JSON bundle before transmission.
-2. **Rateless fountain codes in color matrices.** The sender loops LT-coded frames. The receiver can join at any moment, skip any frames, and still reconstruct the payload.
-3. **Screen lock-on (SAM 3.1, connected side).** Text-prompted video tracking acquires the far screen for the return channel. Classical finder-pattern tracking and homography handle every frame.
-4. **Offline policy gate (air-gapped side).** Every received work order is checked on the device against the local site policy (assets, setpoint limits, injected instructions) before anything is applied. It never calls the network and it fails closed: a tampered order is rejected, a clean one is held until a local verifier model has checked it too. Cloud models run only on the connected sender; [why](META_AI_INTEGRATION.md#where-each-model-runs-and-why).
+2. **Red-team before sending (Muse Glimmer 30B, connected side).** A second Meta model attacks each bundle against its source document, on top of deterministic grounding checks, so a wrong or tampered order is flagged before it leaves.
+3. **Rateless fountain codes in color matrices.** The sender loops LT-coded frames. The receiver can join at any moment, skip any frames, and still reconstruct the payload.
+4. **Screen lock-on (SAM 3.1, connected side).** Text-prompted video tracking acquires the far screen for the return channel. Classical finder-pattern tracking and homography handle every frame.
+5. **Offline policy gate (air-gapped side).** Every received work order is checked on the device against the local site policy (assets, setpoint limits, injected instructions) before anything is applied. It never calls the network and it fails closed: a tampered order is rejected, a clean one is held until a local verifier model has checked it too. Cloud models run only on the connected sender; [why](META_AI_INTEGRATION.md#where-each-model-runs-and-why).
 
 ## What was built during the hackathon
 
@@ -26,8 +27,8 @@ The hackathon's rules require new work only. Everything in this repo was written
 
 ```
 packages/lumina-protocol   LT fountain codec, frame format, grid, camera-frame reader, file envelope (zero deps)
-packages/lumina-agents     Meta models: Muse Spark packer, policy gate + verifier agent, SAM 3.1 client
-apps/web                   React PWA: transmitter (Day 2), receiver (Day 3)
+packages/lumina-agents     Meta models: Muse Spark packer, Glimmer red-team, policy gate + verifier agent, SAM 3.1 client
+apps/web                   React PWA: transmitter, receiver, signed return channel
 docs/                      Architecture, 10-day plan, decisions
 ```
 
@@ -35,10 +36,11 @@ docs/                      Architecture, 10-day plan, decisions
 
 You need a laptop and a phone. Open **https://singhsahab555.github.io/lumina-ai/** on both.
 
-1. **Laptop, Transmit tab → Meta AI packer → "Replay recorded Meta AI pack".** This replays a real run in which a Meta model distilled a 45-day, 55 KB pump-station shift log into a 1.6 KB schema-checked work order. You'll see each attempt, the validation errors sent back to the model, and the 7 resulting steps. The site is static, so it can't hold a model key; run `npm run dev` locally for a live pack.
-2. **Click "Beam this bundle over light".** The laptop starts flashing an 8-color grid.
-3. **Phone: switch to Receive, turn on airplane mode, tap Start camera,** and point it at the grid. Cover the screen with your hand for a moment if you like; the fountain code doesn't care which frames are missed.
-4. The phone shows **SHA-256 verified, byte-exact**, and lets you download the work order, with no network at any point.
+1. **Laptop, Transmit tab → Meta AI packer → "Replay recorded Meta AI pack".** This replays a real run in which a Meta model distilled a 45-day, 55 KB pump-station shift log into a 1.6 KB schema-checked work order. You'll see each attempt and the 7 resulting steps. The site is static, so it can't hold a model key; run `npm run dev` locally for a live pack.
+2. **Click "Replay recorded red-team".** Muse Glimmer 30B attacked this bundle against the source log and found nothing (CLEAR). Try **"Attack demo: stage a tampered copy"** too: Glimmer flags the 9 bar limit and the injected interlock bypass.
+3. **Click "Beam this bundle over light".** The laptop starts flashing an 8-color grid.
+4. **Phone: switch to Receive, turn on airplane mode, tap Start camera,** and point it at the grid. Cover the screen with your hand for a moment if you like; the fountain code doesn't care which frames are missed.
+5. The phone shows **SHA-256 verified, byte-exact**, runs the site-policy gate offline (clean order HOLD, tampered order **REJECTED**), and can beam a signed ack back to the laptop. No network at any point.
 
 ## Quick start
 
@@ -83,7 +85,7 @@ The reverse direction also works without certificates: phone transmits (plain `h
 ## Meta models used
 
 - **Muse Spark Open** on Baseten: semantic packing on the connected side (the recorded run in the live app: 1 attempt, 16 s). **Muse Spark** on the Meta Model API takes over once the API account is active.
-- **Muse Glimmer 30B** (Meta open weights) on NVIDIA NIM, connected side: packer fallback, and a red-team pass on each bundle before it is sent (Day 8)
+- **Muse Glimmer 30B** (Meta open weights) on NVIDIA NIM, connected side: packer fallback, and a red-team pass on each bundle before it is sent (clean order CLEAR in 122 s; tampered order FLAGGED in 91 s on exactly the two bad steps)
 - **SAM 3.1**, via the Meta Model API: screen acquisition and tracking on the connected side
 - **Muse Glimmer 30B** on plant hardware (Ollama) is the intended optional verifier behind the policy gate. It is not run in the demo, because the demo hardware can't hold it, and we never move it to the cloud. See [Where each model runs, and why](META_AI_INTEGRATION.md#where-each-model-runs-and-why).
 

@@ -108,3 +108,18 @@ test('1 MB file at 25% loss decodes incrementally with tiny overhead', () => {
   assert.ok(performance.now() - t0 < 5000);
   assert.deepEqual(dec.result(), data);
 });
+
+test('blockStates: systematic droplets solve their block, repair droplets pin blocks until the rank is full', () => {
+  const data = randomBytes(20_000, 11);
+  const enc = new LTEncoder(data, 256, 8);
+  const dec = new LTDecoder(enc.config);
+  dec.add(enc.droplet(0));
+  dec.add(enc.droplet(enc.k + 3));
+  const s = dec.blockStates();
+  assert.equal(s.length, enc.k);
+  assert.equal(s[0], 2);
+  assert.equal(s.filter((v) => v === 1).length, 1);
+  let seed = enc.k + 4;
+  while (!dec.done) dec.add(enc.droplet(seed++));
+  assert.ok(dec.blockStates().every((v) => v === 2));
+});

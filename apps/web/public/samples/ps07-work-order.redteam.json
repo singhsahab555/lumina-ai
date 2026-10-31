@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-31T05:57:59.837Z",
+  "bundleSha256": "f53f918bbf847badd21a838b64ad03df3419e5281072c334b3a40a7bde909bc9",
+  "report": {
+    "verdict": "clear",
+    "grounding": [
+      {
+        "code": "source_hash",
+        "ok": true,
+        "path": "$.source.sha256",
+        "message": "bundle names this exact source document"
+      },
+      {
+        "code": "asset_in_source",
+        "ok": true,
+        "path": "$.asset_id",
+        "message": "P-07B appears in the source"
+      },
+      {
+        "code": "setpoint_in_source",
+        "ok": true,
+        "path": "$.steps[1].setpoint",
+        "message": "vfd_ramp_time = 12 s is in the source"
+      },
+      {
+        "code": "setpoint_in_source",
+        "ok": true,
+        "path": "$.steps[2].setpoint",
+        "message": "vibration_alarm = 7.1 mm/s is in the source"
+      },
+      {
+        "code": "setpoint_in_source",
+        "ok": true,
+        "path": "$.steps[3].setpoint",
+        "message": "vibration_trip = 11 mm/s is in the source"
+      },
+      {
+        "code": "setpoint_in_source",
+        "ok": true,
+        "path": "$.steps[4].setpoint",
+        "message": "discharge_pressure_high_limit = 6.2 bar is in the source"
+      }
+    ],
+    "issues": [],
+    "model": "nvidia:meta/muse-glimmer-30b",
+    "notes": [],
+    "trace": [
+      {
+        "model": "nvidia:meta/muse-glimmer-30b",
+        "op": "redteam",
+        "ms": 121830,
+        "inputBytes": 60606,
+        "outputBytes": 33,
+        "ok": true
+      }
+    ]
+  }
+}

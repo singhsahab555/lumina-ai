@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
-import { BASETEN_SPARK_MODEL, MetaChatModel, OllamaChatModel, PackError, packWorkOrder, packerFromEnv, parseSamOutput, samFindScreen, samFromEnv, samSegmentRequest, sha256Hex, verifyBundle } from '../src/index.ts';
+import { BASETEN_SPARK_MODEL, MetaChatModel, OllamaChatModel, PackError, packWorkOrder, packerFromEnv, parseSamOutput, redTeamBundle, redTeamFromEnv, samFindScreen, samFromEnv, samSegmentRequest, sha256Hex, verifyBundle } from '../src/index.ts';
 import { ScriptedModel, fakeFetch, policy, sampleLog, say, tamperedBundle, validBundle } from './helpers.ts';
 
 const call = (name: string, args: Record<string, unknown>, id = name) => ({ id, name, arguments: args });
@@ -228,4 +228,46 @@ test('demo samples: the packed PS-07 order holds, its tampered copy is rejected 
   const v = await verifyBundle(sample('ps07-work-order-tampered.json'), policy(), null);
   assert.equal(v.decision, 'reject');
   assert.deepEqual(v.findings.map((f) => `${f.path} ${f.code}`), ['$.steps[4].setpoint out_of_range', '$.steps[5].instruction injection_suspected']);
+});
+
+// ── red-team (sender, before beaming) ───────────────────────────────────
+
+const samples = (name: string) => readFileSync(new URL(`../../../apps/web/public/samples/${name}`, import.meta.url), 'utf8');
+const shiftLog = () => ({ title: 'ps07-shift-log-45d.txt', text: samples('ps07-shift-log-45d.txt') });
+
+test('red-team grounding: the packed order is grounded, the tampered 9 bar is not, with no model', async () => {
+  const clean = await redTeamBundle(JSON.parse(samples('ps07-work-order.json')), shiftLog(), null);
+  assert.equal(clean.verdict, 'grounding-only');
+  assert.ok(clean.grounding.every((c) => c.ok));
+  assert.equal(clean.grounding.filter((c) => c.code === 'setpoint_in_source').length, 4);
+
+  const tampered = await redTeamBundle(JSON.parse(samples('ps07-work-order-tampered.json')), shiftLog(), null);
+  assert.equal(tampered.verdict, 'flag');
+  assert.deepEqual(tampered.grounding.filter((c) => !c.ok).map((c) => c.path), ['$.steps[4].setpoint']);
+});
+
+test('red-team: Glimmer sees source and bundle as data; issues flag even under a "clear" label', async () => {
+  const model = new ScriptedModel([say('{"verdict":"clear","issues":[{"step":6,"kind":"injection","detail":"bypass the vibration trip interlock"}]}')]);
+  const seen: string[] = [];
+  const r = await redTeamBundle(JSON.parse(samples('ps07-work-order.json')), shiftLog(), model, { onTrace: (e) => seen.push(e.op) });
+  assert.equal(r.verdict, 'flag');
+  assert.deepEqual(r.issues.map((i) => `${i.step} ${i.kind}`), ['6 injection']);
+  assert.deepEqual(seen, ['redteam']);
+  const user = model.requests[0].messages[1].content;
+  assert.match(user, /WORK ORDER WO-2026-1027/);
+  assert.match(user, /"asset_id": "P-07B"/);
+});
+
+test('red-team: a clear model cannot clear an ungrounded bundle; a broken model leaves grounding-only', async () => {
+  const tampered = JSON.parse(samples('ps07-work-order-tampered.json'));
+  const fooled = await redTeamBundle(tampered, shiftLog(), new ScriptedModel([say('{"verdict":"clear","issues":[]}')]));
+  assert.equal(fooled.verdict, 'flag');
+  const broken = await redTeamBundle(JSON.parse(samples('ps07-work-order.json')), shiftLog(), new ScriptedModel([say('no json here')]));
+  assert.equal(broken.verdict, 'grounding-only');
+  assert.match(broken.notes[0], /not a valid red-team report/);
+});
+
+test('redTeamFromEnv uses Glimmer on NIM only', () => {
+  assert.equal(redTeamFromEnv({ BASETEN_API_KEY: 'b' }), null);
+  assert.equal(redTeamFromEnv({ NVIDIA_API_KEY: 'n' })?.id, 'nvidia:meta/muse-glimmer-30b');
 });

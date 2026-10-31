@@ -4,6 +4,8 @@
 //   npm run cli -- pack   <document.txt> [out.json]      Muse Spark (MODEL_API_KEY, else BASETEN_API_KEY), else Muse Glimmer 30B on NVIDIA NIM
 //   npm run cli -- verify <bundle.json>  [policy.json] [--record run.json]
 //                                                        plant verifier via Ollama (OLLAMA_URL, VERIFIER_MODEL); --record saves the run for replay
+//   npm run cli -- redteam <bundle.json> <source.txt> [--record run.json]
+//                                                        Muse Glimmer 30B on NVIDIA NIM attacks the bundle before it is beamed
 //
 // Config comes from the repo-root .env (see .env.example).
 
@@ -14,6 +16,8 @@ import {
   OllamaChatModel,
   packWorkOrder,
   packerFromEnv,
+  redTeamBundle,
+  redTeamFromEnv,
   sha256Hex,
   validateBundle,
   verifyBundle,
@@ -48,6 +52,7 @@ async function main(): Promise<void> {
     console.log(`NVIDIA NIM key: ${env.NVIDIA_API_KEY ? 'set' : 'missing'}  (${env.NVIDIA_MODEL ?? 'meta/muse-glimmer-30b'})`);
     const g = verifier();
     console.log(`Packer in use: ${packerFromEnv(env)?.id ?? 'none'}`);
+    console.log(`Red-team in use: ${redTeamFromEnv(env)?.id ?? 'none (grounding checks only)'}`);
     console.log(`Ollama ${g.id}: ${(await g.available()) ? 'ready' : 'not available (ollama serve + ollama pull)'}`);
   } else if (cmd === 'pack' && a) {
     // The sender packs for a known site; default to the demo receiver's policy site.
@@ -77,8 +82,22 @@ async function main(): Promise<void> {
     for (const f of v.findings) console.log(`  [${f.severity}] ${f.code} ${f.path}: ${f.message}`);
     for (const r of v.model?.reasons ?? []) console.log(`  model: ${r}`);
     for (const n of v.notes) console.log(`  note: ${n}`);
+  } else if (cmd === 'redteam' && a && b) {
+    const parsed = validateBundle(JSON.parse(readFileSync(a, 'utf8')));
+    if (!parsed.ok) throw new Error(`invalid bundle:\n  ${parsed.errors.join('\n  ')}`);
+    const r = await redTeamBundle(parsed.bundle, { title: basename(b), text: readFileSync(b, 'utf8') }, redTeamFromEnv(env));
+    if (record) {
+      // Replayed by the web packer panel, only for this exact bundle.
+      const bundleSha256 = await sha256Hex(new TextEncoder().encode(JSON.stringify(parsed.bundle)));
+      writeFileSync(record, JSON.stringify({ date: new Date().toISOString(), bundleSha256, report: r }, null, 2) + '\n');
+    }
+    printTrace(r.trace);
+    console.log(`RED-TEAM: ${r.verdict.toUpperCase()}`);
+    for (const c of r.grounding) console.log(`  [${c.ok ? 'ok' : 'FAIL'}] ${c.code} ${c.path}: ${c.message}`);
+    for (const i of r.issues) console.log(`  model: step ${i.step ?? '-'} ${i.kind}: ${i.detail}`);
+    for (const n of r.notes) console.log(`  note: ${n}`);
   } else {
-    console.log('usage: cli status | pack <doc> [out.json] | verify <bundle.json> [policy.json] [--record run.json]');
+    console.log('usage: cli status | pack <doc> [out.json] | verify <bundle.json> [policy.json] [--record run.json] | redteam <bundle.json> <source.txt> [--record run.json]');
     process.exitCode = 2;
   }
 }

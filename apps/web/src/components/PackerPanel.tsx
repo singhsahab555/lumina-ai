@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import type { TraceEvent, WorkOrderBundle } from '@lumina/agents';
 import { formatBytes, formatDuration } from './Stat.tsx';
+import { RedTeamPanel } from './RedTeamPanel.tsx';
 
 // Meta AI packer on the connected sender. With the local helper (npm run dev /
 // lan, see server/pack-api.ts) it packs the 45-day shift log live. Where there
 // is no helper, e.g. GitHub Pages, it replays the recorded real run that
-// produced samples/ps07-work-order.json, labelled as recorded.
+// produced samples/ps07-work-order.json, labelled as recorded. Either way the
+// bundle is red-teamed (RedTeamPanel) before the operator beams it.
 
 const SOURCE = 'ps07-shift-log-45d.txt';
 const BUNDLE = 'ps07-work-order.json';
+const TAMPERED = 'ps07-work-order-tampered.json';
 const sampleUrl = (name: string) => `${import.meta.env.BASE_URL}samples/${name}`;
 
 interface Run {
@@ -22,7 +25,8 @@ interface Run {
 type Status =
   | { kind: 'idle' }
   | { kind: 'running'; startedAt: number; model: string }
-  | { kind: 'done'; run: Run; bundle: WorkOrderBundle; json: string; live: boolean }
+  // run is null for a staged tampered copy, which no model produced.
+  | { kind: 'done'; name: string; run: Run | null; bundle: WorkOrderBundle; json: string; live: boolean }
   | { kind: 'error'; message: string };
 
 export function PackerPanel({ onBeam }: { onBeam: (name: string, bytes: Uint8Array) => void }) {
@@ -66,7 +70,7 @@ export function PackerPanel({ onBeam }: { onBeam: (name: string, bytes: Uint8Arr
           else if (msg.type === 'error') setStatus({ kind: 'error', message: msg.message });
           else if (msg.type === 'done') {
             const r = msg.result;
-            setStatus({ kind: 'done', run: r, bundle: r.bundle, json: r.json, live: true });
+            setStatus({ kind: 'done', name: BUNDLE, run: r, bundle: r.bundle, json: r.json, live: true });
           }
         }
       }
@@ -91,7 +95,15 @@ export function PackerPanel({ onBeam }: { onBeam: (name: string, bytes: Uint8Arr
     }
     // Beam the compact form, as a live pack would, so the size shown is the size sent.
     const bundle = JSON.parse(json) as WorkOrderBundle;
-    setStatus({ kind: 'done', run, bundle, json: JSON.stringify(bundle), live: false });
+    setStatus({ kind: 'done', name: BUNDLE, run, bundle, json: JSON.stringify(bundle), live: false });
+  };
+
+  // Attack demo: the packed order as a compromised sender would alter it.
+  const stageTampered = async () => {
+    ++replay.current;
+    setAttempts([]);
+    const bundle = (await fetch(sampleUrl(TAMPERED)).then((r) => r.json())) as WorkOrderBundle;
+    setStatus({ kind: 'done', name: TAMPERED, run: null, bundle, json: JSON.stringify(bundle), live: false });
   };
 
   const live = Boolean(liveModel);
@@ -137,17 +149,35 @@ export function PackerPanel({ onBeam }: { onBeam: (name: string, bytes: Uint8Arr
 
       {status.kind === 'error' && <p className="mt-2 text-xs text-red-400">{status.message}</p>}
 
+      <button
+        className="mt-1.5 w-full text-left text-[11px] text-red-400/80 hover:text-red-300 disabled:opacity-40"
+        disabled={status.kind === 'running'}
+        onClick={() => void stageTampered()}
+        data-testid="stage-tampered"
+        title="The packed PS-07 order, altered by a compromised sender: discharge limit 9 bar and an injected interlock bypass"
+      >
+        Attack demo: stage a tampered copy instead →
+      </button>
+
+      {done && !done.run && (
+        <p className="mt-2 rounded bg-red-950/60 px-2 py-1 text-xs text-red-300" data-testid="staged-tampered">
+          Staged: tampered copy of the packed order (discharge limit 9 bar, injected interlock bypass).
+        </p>
+      )}
+
       {done && (
         <div className="mt-2 space-y-2">
-          <p className="text-xs">
-            <span className="font-mono">{formatBytes(done.run.sourceBytes)}</span> →{' '}
-            <span className="font-mono text-yellow-400">{formatBytes(done.run.bundleBytes)}</span>{' '}
-            <span className="text-zinc-500">
-              ({Math.round(done.run.sourceBytes / done.run.bundleBytes)}× smaller, {done.run.attempts} attempt
-              {done.run.attempts > 1 ? 's' : ''}
-              {!done.live && done.run.date ? `, recorded ${done.run.date.slice(0, 10)}` : ''})
-            </span>
-          </p>
+          {done.run && (
+            <p className="text-xs">
+              <span className="font-mono">{formatBytes(done.run.sourceBytes)}</span> →{' '}
+              <span className="font-mono text-yellow-400">{formatBytes(done.run.bundleBytes)}</span>{' '}
+              <span className="text-zinc-500">
+                ({Math.round(done.run.sourceBytes / done.run.bundleBytes)}× smaller, {done.run.attempts} attempt
+                {done.run.attempts > 1 ? 's' : ''}
+                {!done.live && done.run.date ? `, recorded ${done.run.date.slice(0, 10)}` : ''})
+              </span>
+            </p>
+          )}
           <details className="text-xs text-zinc-400">
             <summary className="cursor-pointer">
               {done.bundle.asset_id} · {done.bundle.steps.length} steps · {done.bundle.site}
@@ -161,9 +191,10 @@ export function PackerPanel({ onBeam }: { onBeam: (name: string, bytes: Uint8Arr
               ))}
             </ol>
           </details>
+          <RedTeamPanel bundle={done.bundle} fileName={done.name} />
           <button
             className="w-full rounded-lg bg-yellow-400 px-3 py-1.5 font-medium text-black"
-            onClick={() => onBeam(BUNDLE, new TextEncoder().encode(done.json))}
+            onClick={() => onBeam(done.name, new TextEncoder().encode(done.json))}
             data-testid="beam-bundle"
           >
             Beam this bundle over light

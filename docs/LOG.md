@@ -2,6 +2,18 @@
 
 Measured numbers per day. Newest first.
 
+## Day 8: Glimmer red-team, flow view, block matrix (Sat Oct 31, built early)
+
+- **Red-team before sending** (`redteam.ts`). After Spark packs a bundle, Muse Glimmer 30B on NVIDIA NIM (a different Meta model) gets the whole 56 KB source log and the bundle, and hunts for steps or values the log does not state, steps that weaken a safety function, and instruction-like text. It returns a verdict and per-step issues.
+- **Grounding checks first, no model:** the source hash must match the log, the asset must appear in it, and every setpoint value must appear in it with its unit. The model can add flags but cannot clear an ungrounded bundle. Bug found on the way: matching bare numbers let the date `10-09` "ground" the tampered 9 bar, so values are now matched together with their unit.
+- **Measured (NIM, Oct 31):** packed order **CLEAR** in 122 s; tampered copy **FLAGGED** in 91 s, on exactly step 5 (*unsafe*: "source work order specifies 6.2 bar; bundle sets 9 bar, weakening pressure protection") and step 6 (*injection*), and grounding fails on the 9 bar. Free tier, no credit spent.
+- **Prompt lesson:** the first prompt said "missing a real problem is worse than a false alarm". Glimmer then flagged the clean order 5 times, including a false "the log has no VFD ramp data" (the log's own work-order section says 12 s, was 6 s). Defining "supported" as "stated anywhere in the document, including its planned actions" fixed it, and the tampered result stayed the same.
+- **Web:** `/api/redteam` helper (dev/preview, key in `.env`). The red-team panel sits between the pack and the "Beam" button. Grounding runs in the browser at once; on GitHub Pages the recorded Glimmer runs (`*.redteam.json`) replay, but only for the exact bundle (SHA-256 match). "Attack demo: stage a tampered copy" sends the altered order through the same red-team. The red-team is advisory; the plant gate still decides.
+- **Look:** a header flow bar (Pack → Red-team → Beam → Policy gate → Signed ack, with the model or "no model" at each stage, coloured by connected / air gap / plant side; hidden on phones). The receiver draws a **block matrix** of the fountain code: missing, pinned by mixed droplets, recovered (`LTDecoder.blockStates()`).
+- The receiver no longer shows a grey "SAM 3.1 needs a key" note. Without a key it reads the whole frame, as before, silently.
+- Browser e2e: 2-color 5.0 KB/s, 8-color 9.8 KB/s, Auto 12.2 KB/s, all byte-exact. The 8-color figure is lower than Day 7's 15.4 KB/s on unchanged decoder code, so it is run-to-run noise in headless Edge; to watch on Day 9.
+- Tests: agents 27/27 (grounding on the real samples, the model sees source and bundle, a clear model can't clear an ungrounded bundle, provider selection), protocol 29/29 (block states), web 10/10.
+
 ## Day 7: return channel (Mode 3) and SAM 3.1 screen finder (Fri Oct 30, built early)
 
 - **Signed ack over light.** Once a file arrives byte-exact, the plant screen offers "Beam signed ack back". The `lumina.ack/v1` JSON names the file's SHA-256, the plant's decision (the gate's APPROVE/HOLD/REJECT with finding codes, or RECEIVED for a non-order file), who decided, and receive telemetry (seconds, frames, CRC-valid frames, droplets, K). It goes back through the same deflate → LT → grid path, in Auto mode, at 5/10/20 sym/s. An ack is ~650 B, a block or two after deflate, so it crosses in well under a second at 10 sym/s.

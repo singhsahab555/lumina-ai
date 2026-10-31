@@ -30,16 +30,23 @@ export function packerFromEnv(env: Record<string, string | undefined>): MetaChat
       jsonMode: 'object',
     });
   }
-  if (env.NVIDIA_API_KEY) {
-    return new MetaChatModel({
-      apiKey: env.NVIDIA_API_KEY,
-      baseUrl: env.NVIDIA_BASE_URL || NVIDIA_BASE_URL,
-      model: env.NVIDIA_MODEL || NVIDIA_GLIMMER_MODEL,
-      provider: 'nvidia',
-      stream: true,
-    });
-  }
-  return null;
+  return redTeamFromEnv(env);
+}
+
+/**
+ * Red-team model for the connected sender: Muse Glimmer 30B on NVIDIA NIM, a
+ * different model from the Spark packer, so the reviewer doesn't share the
+ * packer's blind spots. Null without NVIDIA_API_KEY.
+ */
+export function redTeamFromEnv(env: Record<string, string | undefined>): MetaChatModel | null {
+  if (!env.NVIDIA_API_KEY) return null;
+  return new MetaChatModel({
+    apiKey: env.NVIDIA_API_KEY,
+    baseUrl: env.NVIDIA_BASE_URL || NVIDIA_BASE_URL,
+    model: env.NVIDIA_MODEL || NVIDIA_GLIMMER_MODEL,
+    provider: 'nvidia',
+    stream: true,
+  });
 }
 
 export interface MetaConfig {

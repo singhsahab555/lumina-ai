@@ -164,6 +164,13 @@ export class LTDecoder {
     return this.blocks[index] !== null;
   }
 
+  /** Per block: 0 unknown, 1 pinned by an equation (pivot of an unsolved row), 2 solved. Drawn as the receiver's block matrix. */
+  blockStates(): Uint8Array {
+    const s = new Uint8Array(this.k);
+    for (let i = 0; i < this.k; i++) s[i] = this.blocks[i] ? 2 : this.pivots[i] ? 1 : 0;
+    return s;
+  }
+
   /** Returns true once the whole payload is recovered. */
   add(droplet: Droplet): boolean {
     if (this.done || this.seenSeeds.has(droplet.seed)) return this.done;

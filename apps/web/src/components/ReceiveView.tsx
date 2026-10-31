@@ -4,6 +4,7 @@ import type { ScreenFind } from '@lumina/agents';
 import type { ReceivedFile, RxStats } from '../lib/receiver.ts';
 import type { RxRequest, RxResponse } from '../lib/receiver.worker.ts';
 import { Stat, formatBytes, formatDuration } from './Stat.tsx';
+import { BlockMatrix } from './BlockMatrix.tsx';
 import { VerifierPanel, parseBundle } from './VerifierPanel.tsx';
 import { AckBeam, type PlantDecision } from './AckBeam.tsx';
 import { AckPanel } from './AckPanel.tsx';
@@ -318,31 +319,26 @@ export function ReceiveView() {
           error && <p className="text-sm text-red-400">{error}</p>
         )}
 
-        {scanning && sam.kind !== 'absent' && (
+        {/* Without a SAM key the receiver silently reads the whole frame (Day 3 behaviour), so there is nothing to show. */}
+        {scanning && sam.kind !== 'absent' && sam.kind !== 'no-key' && (
           <div className="flex flex-col gap-1 rounded-lg bg-zinc-900 p-2 text-xs" data-testid="sam">
-            {sam.kind === 'no-key' ? (
-              <span className="text-zinc-500">SAM 3.1 needs MODEL_API_KEY (Meta Model API) on this helper. Reading the whole frame.</span>
-            ) : (
-              <>
-                <button
-                  className="rounded-md bg-sky-800 px-3 py-1.5 text-white hover:bg-sky-700 disabled:opacity-40"
-                  disabled={sam.kind === 'finding' || phase !== 'scanning'}
-                  onClick={() => void findScreen.current?.()}
-                  data-testid="sam-find"
-                >
-                  {sam.kind === 'finding' ? 'SAM 3.1 looking…' : sam.kind === 'locked' ? 'Find the screen again' : 'Find the far screen (SAM 3.1)'}
-                </button>
-                {sam.kind === 'locked' && (
-                  <span className="text-sky-300" data-testid="sam-locked">
-                    Locked: {Math.round(sam.roi.w)}×{Math.round(sam.roi.h)} px region, decoded at camera resolution · {sam.find.trace.ms} ms
-                  </span>
-                )}
-                {sam.kind === 'missed' && (
-                  <span className="text-amber-400">
-                    {sam.error ? `SAM 3.1: ${sam.error}` : 'SAM 3.1 found no monitor'}. Reading the whole frame.
-                  </span>
-                )}
-              </>
+            <button
+              className="rounded-md bg-sky-800 px-3 py-1.5 text-white hover:bg-sky-700 disabled:opacity-40"
+              disabled={sam.kind === 'finding' || phase !== 'scanning'}
+              onClick={() => void findScreen.current?.()}
+              data-testid="sam-find"
+            >
+              {sam.kind === 'finding' ? 'SAM 3.1 looking…' : sam.kind === 'locked' ? 'Find the screen again' : 'Find the far screen (SAM 3.1)'}
+            </button>
+            {sam.kind === 'locked' && (
+              <span className="text-sky-300" data-testid="sam-locked">
+                Locked: {Math.round(sam.roi.w)}×{Math.round(sam.roi.h)} px region, decoded at camera resolution · {sam.find.trace.ms} ms
+              </span>
+            )}
+            {sam.kind === 'missed' && (
+              <span className="text-amber-400">
+                {sam.error ? `SAM 3.1: ${sam.error}` : 'SAM 3.1 found no monitor'}. Reading the whole frame.
+              </span>
             )}
           </div>
         )}
@@ -359,6 +355,7 @@ export function ReceiveView() {
               <div className="h-2 overflow-hidden rounded bg-zinc-800">
                 <div className="h-full bg-yellow-400 transition-[width]" style={{ width: `${progress * 100}%` }} />
               </div>
+              <BlockMatrix states={stats.blocks} />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <Stat label="Session" value={stats.sessionId === null ? '-' : stats.sessionId.toString(16).padStart(8, '0')} />

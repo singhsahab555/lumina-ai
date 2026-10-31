@@ -6,6 +6,7 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 import { packApi } from './server/pack-api.ts';
 import { verifyApi } from './server/verify-api.ts';
 import { samApi } from './server/sam-api.ts';
+import { redTeamApi } from './server/redteam-api.ts';
 
 // `--mode lan` serves over self-signed HTTPS on the LAN: phones only grant
 // camera access to secure origins.
@@ -19,6 +20,8 @@ export default defineConfig(({ mode }) => ({
     mode === 'lan' && basicSsl(),
     // Local Meta AI packer endpoint (dev/preview only; the Pages build is static).
     packApi(),
+    // Glimmer red-team pass on each packed bundle before it is beamed (NVIDIA NIM; dev/preview only).
+    redTeamApi(),
     // Plant-side verifier endpoint (Ollama on the plant network; dev/preview only).
     verifyApi(),
     // SAM 3.1 screen finder for the return-channel camera (Meta Model API; dev/preview only).

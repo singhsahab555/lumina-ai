@@ -23,6 +23,8 @@ export interface RxStats {
   solved: number;
   /** Unique droplets fed to the active decoder. */
   received: number;
+  /** LTDecoder.blockStates() of the active decoder. */
+  blocks: Uint8Array;
 }
 
 export interface FrameReport {
@@ -95,6 +97,7 @@ export class ReceiverSession {
       k: dec?.k ?? 0,
       solved: dec ? Math.round(dec.progress * dec.k) : 0,
       received: dec?.received ?? 0,
+      blocks: dec?.blockStates() ?? new Uint8Array(0),
     };
   }
 }
