@@ -2,6 +2,11 @@
 
 Measured numbers per day. Newest first.
 
+## Day 9: real-camera run on a tablet (Mon Nov 2)
+
+- **Measured, tablet in airplane mode reading the laptop screen:** 9.9 KB file, 12 / 12 blocks, **SHA-256 verified, byte-exact** in **24.0 s (420 B/s)**, with the decoder at 2 fps (475 ms per frame). The screen was blocked with a dark sheet mid-transfer and the file still completed.
+- **Tablet overlay fix:** the overlay canvas is scaled down above 1280 px, but the grid outline was drawn in unscaled video pixels. On a camera wider than 1280 px the box came out too large and offset. It now uses the same scale as the rest of the overlay and also resizes when only the height changes (rotation). Display only; decoding is unchanged.
+
 ## Day 8: Glimmer red-team, flow view, block matrix (Sat Oct 31, built early)
 
 - **Red-team before sending** (`redteam.ts`). After Spark packs a bundle, Muse Glimmer 30B on NVIDIA NIM (a different Meta model) gets the whole 56 KB source log and the bundle, and hunts for steps or values the log does not state, steps that weaken a safety function, and instruction-like text. It returns a verdict and per-step issues.

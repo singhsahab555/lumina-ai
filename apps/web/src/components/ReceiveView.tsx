@@ -53,7 +53,7 @@ function drawQuad(canvas: HTMLCanvasElement, quad: Point[] | null, valid: boolea
   g.lineWidth = Math.max(3, canvas.width / 240);
   g.strokeStyle = valid ? '#4ade80' : '#facc15';
   g.beginPath();
-  quad.forEach((p, i) => (i ? g.lineTo(p.x, p.y) : g.moveTo(p.x, p.y)));
+  quad.forEach((p, i) => (i ? g.lineTo(p.x * k, p.y * k) : g.moveTo(p.x * k, p.y * k)));
   g.closePath();
   g.stroke();
 }
@@ -222,9 +222,11 @@ export function ReceiveView() {
           }
           k = Math.min(1, MAX_SIDE / Math.max(v.videoWidth, v.videoHeight));
           const ow = Math.round(v.videoWidth * k);
-          if (overlay.current && overlay.current.width !== ow) {
+          const oh = Math.round(v.videoHeight * k);
+          // Both sides: a tablet rotating can change the height alone.
+          if (overlay.current && (overlay.current.width !== ow || overlay.current.height !== oh)) {
             overlay.current.width = ow;
-            overlay.current.height = Math.round(v.videoHeight * k);
+            overlay.current.height = oh;
           }
           g.drawImage(v, c.sx, c.sy, c.sw, c.sh, 0, 0, w, h);
           const img = g.getImageData(0, 0, w, h);

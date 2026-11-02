@@ -11,7 +11,7 @@ Industrial control systems, lab instruments, energy and manufacturing OT network
 1. **Semantic packing (Muse Spark, connected side).** Distills large manuals, logs, or work orders into a compact, schema-checked JSON bundle before transmission.
 2. **Red-team before sending (Muse Glimmer 30B, connected side).** A second Meta model attacks each bundle against its source document, on top of deterministic grounding checks, so a wrong or tampered order is flagged before it leaves.
 3. **Rateless fountain codes in color matrices.** The sender loops LT-coded frames. The receiver can join at any moment, skip any frames, and still reconstruct the payload.
-4. **Screen lock-on (SAM 3.1, connected side).** Text-prompted video tracking acquires the far screen for the return channel. Classical finder-pattern tracking and homography handle every frame.
+4. **Screen lock-on (SAM 3.1, connected side).** Text-prompted video tracking acquires the far screen for the return channel. Classical finder-pattern tracking and homography handle every frame. Built and tested, but not live: it needs a Meta Model API key, and without one the receiver reads the whole frame.
 5. **Offline policy gate (air-gapped side).** Every received work order is checked on the device against the local site policy (assets, setpoint limits, injected instructions) before anything is applied. It never calls the network and it fails closed: a tampered order is rejected, a clean one is held until a local verifier model has checked it too. Cloud models run only on the connected sender; [why](META_AI_INTEGRATION.md#where-each-model-runs-and-why).
 
 ## What was built during the hackathon
@@ -86,7 +86,7 @@ The reverse direction also works without certificates: phone transmits (plain `h
 
 - **Muse Spark Open** on Baseten: semantic packing on the connected side (the recorded run in the live app: 1 attempt, 16 s). **Muse Spark** on the Meta Model API takes over once the API account is active.
 - **Muse Glimmer 30B** (Meta open weights) on NVIDIA NIM, connected side: packer fallback, and a red-team pass on each bundle before it is sent (clean order CLEAR in 122 s; tampered order FLAGGED in 91 s on exactly the two bad steps)
-- **SAM 3.1**, via the Meta Model API: screen acquisition and tracking on the connected side
+- **SAM 3.1**, via the Meta Model API: screen acquisition and tracking on the connected side (built and tested, not live; the demo does not use it)
 - **Muse Glimmer 30B** on plant hardware (Ollama) is the intended optional verifier behind the policy gate. It is not run in the demo, because the demo hardware can't hold it, and we never move it to the cloud. See [Where each model runs, and why](META_AI_INTEGRATION.md#where-each-model-runs-and-why).
 
 Model weights are never committed to this repo.
