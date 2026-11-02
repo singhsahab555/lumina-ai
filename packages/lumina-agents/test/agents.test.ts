@@ -141,7 +141,7 @@ test('Ollama adapter targets the plant verifier model and round-trips tool messa
   });
 
   assert.equal(calls[0].url, 'http://localhost:11434/api/chat');
-  assert.equal(calls[0].body.model, 'llama3.1:8b');
+  assert.equal(calls[0].body.model, 'muse-glimmer');
   assert.equal(calls[0].body.stream, false);
   assert.deepEqual((calls[0].body.messages as unknown[])[1], { role: 'tool', content: '[]', tool_name: 'scan_text' });
   assert.equal(res.toolCalls[0].name, 'check_asset');

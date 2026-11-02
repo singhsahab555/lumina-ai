@@ -1,4 +1,4 @@
-// Air-gapped side: a plant-network model (Llama 3.1 8B on Ollama) verifies a
+// Air-gapped side: a plant-network model (Muse Glimmer 30B on Ollama) verifies a
 // received bundle against the local site policy before anything is shown as
 // actionable. The deterministic gate alone runs anywhere, even on the phone.
 //

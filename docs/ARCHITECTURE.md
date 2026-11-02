@@ -67,17 +67,11 @@ These numbers are for the pitch and for the demo-day expectations.
 
 Report *measured* KB/s in the UI. "Effective semantic throughput" can be shown as a secondary metric only if it is labeled as such.
 
-## Honesty rules (judges will probe these)
+## Honesty rules
 
 1. Raw mode is lossless and SHA-256 verified end to end. Always show the hash match.
 2. Neural mode is a *semantic summary*. It must not be presented as compression of the original bytes, and the source hash must not be claimed for it.
 3. The *air-gapped side* has to be shown live with networking off. The connected side is allowed to be online. That is the point of the bridge.
-
-## Hackathon constraints (from the participant guide)
-
-- Only Meta models from the guide's list count: Muse Spark/Wonder/Image/Voice Transcribe and SAM 3.1 via the API, and the open-weights Muse Glimmer and Muse Spark Open. **Llama 3.2 and SAM 2 are not on that list.**
-- Anti-projects: no medical-advice features, and nothing political or involving war. The demo uses industrial, lab, or energy scenarios only. No defense or patient-record framing.
-- The demo video (3 min) may show only work built during the hackathon.
 
 ## Wire format
 

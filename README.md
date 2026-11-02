@@ -2,7 +2,7 @@
 
 **A verifiable light-bridge for air-gapped machines.** Move files and AI agent context into (and out of) isolated systems using only a screen and a camera, with no network, RF, or USB involved.
 
-> Built for the **Meta Global AI Developer Hackathon** (Indie track, *Push the Frontier*), Oct 26 – Nov 4, 2026. See [docs/PLAN-10-DAY.md](docs/PLAN-10-DAY.md).
+> Built for the **Meta Global AI Developer Hackathon** (Indie track, *Push the Frontier*), Oct 26 – Nov 4, 2026.
 
 ## Why
 
@@ -47,7 +47,7 @@ You need a laptop and a phone. Open **https://singhsahab555.github.io/lumina-ai/
 ```bash
 # Node >= 22.18 (runs TypeScript natively, no build step)
 npm install
-npm test                       # protocol + web tests
+npm test                       # protocol + agents + web tests
 
 cd apps/web
 npm run dev                    # http://localhost:5173  (Transmit tab; Receive tab = #rx)
@@ -78,7 +78,6 @@ The reverse direction also works without certificates: phone transmits (plain `h
 ## Docs
 
 - [Architecture](docs/ARCHITECTURE.md)
-- [10-day build plan](docs/PLAN-10-DAY.md)
 - [Build log with measured numbers](docs/LOG.md)
 - [Meta AI integration](META_AI_INTEGRATION.md)
 

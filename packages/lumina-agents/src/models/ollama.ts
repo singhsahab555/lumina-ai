@@ -1,10 +1,10 @@
-// Plant-side verifier model via Ollama on the plant network (Llama 3.1 8B by
+// Plant-side verifier model via Ollama on the plant network (Muse Glimmer 30B by
 // default): the only model on the air-gapped side. No API key, no internet.
 
 import { ModelHttpError, type ChatMessage, type ChatModel, type ChatRequest, type ChatResponse } from './types.ts';
 
 export const OLLAMA_URL = 'http://localhost:11434';
-export const VERIFIER_MODEL = 'llama3.1:8b';
+export const VERIFIER_MODEL = 'muse-glimmer';
 
 export interface OllamaConfig {
   baseUrl?: string;

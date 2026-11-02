@@ -8,7 +8,7 @@ import type { PlantDecision } from './AckBeam.tsx';
 // Plant-side check of a received work-order bundle.
 //  1. The deterministic policy gate runs right here, offline, on any device:
 //     it alone can reject, and without a model the best outcome is HOLD.
-//  2. The plant verifier model (Llama 3.1 8B on the plant network's Ollama,
+//  2. The plant verifier model (Muse Glimmer 30B on the plant network's Ollama,
 //     via server/verify-api.ts) inspects it with tool calls. Where that helper
 //     isn't reachable (GitHub Pages) a recorded real run is replayed, but only
 //     for the exact bundle it was recorded on.
