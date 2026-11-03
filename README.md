@@ -29,7 +29,7 @@ The hackathon's rules require new work only. Everything in this repo was written
 packages/lumina-protocol   LT fountain codec, frame format, grid, camera-frame reader, file envelope (zero deps)
 packages/lumina-agents     Meta models: Muse Spark packer, Glimmer red-team, policy gate + verifier agent, SAM 3.1 client
 apps/web                   React PWA: transmitter, receiver, signed return channel
-docs/                      Architecture, 10-day plan, decisions
+docs/                      Architecture, build log with measured numbers
 ```
 
 ## Try it in 2 minutes (no install)
